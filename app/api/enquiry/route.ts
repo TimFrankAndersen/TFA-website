@@ -41,7 +41,18 @@ export async function POST(req: Request) {
         ].join("\n"),
       }),
     });
-    return NextResponse.json({ ok: res.ok }, { status: res.ok ? 200 : 502 });
+    if (!res.ok) {
+      // Log the upstream error for Vercel function logs, and surface the
+      // upstream status (no secrets) so failures are diagnosable:
+      // 401 = bad API key, 403 = from-address domain not verified.
+      const err = await res.text().catch(() => "");
+      console.error("[enquiry] Resend rejected:", res.status, err);
+      return NextResponse.json(
+        { ok: false, upstream: res.status },
+        { status: 502 }
+      );
+    }
+    return NextResponse.json({ ok: true });
   }
 
   console.log("[enquiry] (no RESEND_API_KEY set - logging only)", data);
