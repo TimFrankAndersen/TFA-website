@@ -1,0 +1,38 @@
+[
+  {
+    "stories": [
+      { "h": "OpenAI opens up its app store", "p": "Assistants are becoming platforms, and everyone's building on them. Expect a land-grab as brands rush to be where the conversation already is." },
+      { "h": "Anthropic's Claude runs multi-day tasks on its own", "p": "Agents are quietly moving from demo to day-job. The interesting question is no longer whether they work, but who manages them." },
+      { "h": "Google's Gemini tops every benchmark again", "p": "The search giant is not losing this race. With its own chips and unmatched distribution, Google keeps turning research wins into product wins." },
+      { "h": "A new open model rivals the giants - for free", "p": "The gap between open and closed keeps shrinking. For most companies, good-enough-and-free is a very persuasive combination." },
+      { "h": "AI-designed drug reaches human trials", "p": "This is where AI stops being about productivity. When models start finding medicine, the stakes and the upside change completely." }
+    ]
+  },
+  {
+    "stories": [
+      { "h": "Apple finally ships its AI-native Siri", "p": "Years late, but the install base is enormous. Overnight, hundreds of millions of people get a capable assistant in their pocket." },
+      { "h": "Meta open-sources a video model anyone can run", "p": "Hollywood should be paying attention. The tools to make convincing footage are now free and on your laptop." },
+      { "h": "Nvidia's new chip doubles inference speed", "p": "The moat gets a little deeper. Cheaper inference means AI shows up in places it was too expensive to run before." },
+      { "h": "A startup automates the entire sales call", "p": "Uncomfortable questions for a lot of teams. The demo is good enough that it's no longer a novelty." },
+      { "h": "The EU agrees the next phase of the AI Act", "p": "Compliance just became a board topic. Whatever you think of the rules, ignoring them stopped being an option." }
+    ]
+  },
+  {
+    "stories": [
+      { "h": "Microsoft puts an agent in every Office app", "p": "The assistant era arrives on 400 million desktops at once. The question is how fast people actually change how they work." },
+      { "h": "Amazon's robots now pack orders end-to-end", "p": "The warehouse is quietly changing. Automation moved from moving boxes to handling the fiddly last step." },
+      { "h": "A coding model passes a senior engineer interview", "p": "Not a gimmick this time. The transcript is genuinely hard to tell from a strong human candidate." },
+      { "h": "Deepfake fraud hits a major bank", "p": "The security conversation gets real. Voice and video can no longer be trusted as proof of who is calling." },
+      { "h": "Spotify launches playlists that learn you in real time", "p": "Music discovery, rewired. The model notices your mood shift before you've finished the first song." }
+    ]
+  },
+  {
+    "stories": [
+      { "h": "Tesla's robotaxi opens to the public in Austin", "p": "The long-promised ride finally arrives. The next year will decide whether trust follows the technology." },
+      { "h": "An AI tutor outperforms the classroom in a study", "p": "Education is in for a decade of debate. The result is striking enough that it cannot simply be waved away." },
+      { "h": "Adobe's model edits video by description", "p": "Type the change and it happens. The line between editing and generating just got a lot blurrier." },
+      { "h": "China's open models top the global leaderboard", "p": "The race is no longer a one-country story. Cheap, capable and open is a combination that travels fast." },
+      { "h": "A hospital deploys AI triage in the ER", "p": "Faster answers, new responsibilities. When the model is wrong, who is accountable becomes a real question." }
+    ]
+  }
+]

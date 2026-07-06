@@ -1,66 +1,230 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import Link from "next/link";
+import { getNewsDays, getLinkedInPosts } from "@/lib/content";
 
-export default function Home() {
+export default async function Home() {
+  const [days, posts] = await Promise.all([getNewsDays(), getLinkedInPosts()]);
+  const today = days[0];
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <>
+      {/* HERO - full-bleed on-stage */}
+      <div className="band hero-b">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          className="hero-b-img"
+          src="/images/stage-impact-crop.jpg"
+          alt="Tim Frank Andersen on stage in front of a large conference audience"
         />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
+        <div className="hero-b-scrim" aria-hidden="true" />
+        <div className="hero-b-inner">
+          <div className="wrap">
+            <span className="tick" aria-hidden="true" />
+            <p className="label">
+              Keynote speaker &amp; moderator on AI and technology
+            </p>
+            <h1 className="display-xl">Tim Frank Andersen</h1>
+            <p className="lede">
+              I&rsquo;ve worked in tech for 30 years. Right now the big shift
+              is AI - I help organisations understand what&rsquo;s real,
+              what&rsquo;s next, and what&rsquo;s in it for them.
+            </p>
+            <div className="hero-actions">
+              <Link className="btn" href="/speaking#book">
+                Book Tim
+              </Link>
+              <Link className="arrow" href="/news">
+                See today&rsquo;s AI news &rarr;
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ABOUT TEASER (light) */}
+      <div className="band light">
+        <div className="wrap" data-reveal>
+          <p className="label" style={{ marginBottom: 24 }}>
+            About
           </p>
+          <div className="split">
+            <div>
+              <figure className="about-portrait" style={{ marginTop: 0 }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/portrait-2026-bw.jpg"
+                  alt="Tim Frank Andersen"
+                />
+              </figure>
+            </div>
+            <div>
+              <h2 className="display-m" style={{ marginBottom: 26 }}>
+                Thirty years in digital - from founding one of Denmark&rsquo;s
+                first web agencies to co-founding Institute of AI. Author, TV
+                tech expert, and advisor to some of the world&rsquo;s biggest
+                brands.
+              </h2>
+              <Link className="arrow" href="/about">
+                More about Tim &rarr;
+              </Link>
+            </div>
+          </div>
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </div>
+
+      {/* SPEAKING TEASER (dark) */}
+      <div className="band dark">
+        <div className="wrap" data-reveal>
+          <div className="sec-head">
+            <div>
+              <p className="label">Speaking</p>
+              <h2 className="display-l">Two ways to book Tim</h2>
+            </div>
+            <Link className="arrow" href="/speaking">
+              See speaking &rarr;
+            </Link>
+          </div>
+          <div className="formats">
+            <div>
+              <p className="mono" style={{ color: "var(--green)" }}>
+                Format 01
+              </p>
+              <h3 className="display-s">Keynote - The AI Explosion</h3>
+              <p>
+                What&rsquo;s real, what&rsquo;s next, and what&rsquo;s in it
+                for you. Live demos, honest answers, and a look at the next
+                12-24 months.
+              </p>
+            </div>
+            <div>
+              <p className="mono" style={{ color: "var(--green)" }}>
+                Format 02
+              </p>
+              <h3 className="display-s">Moderator</h3>
+              <p>
+                The person tying it all together - sharp questions and a clear
+                thread through your conference.
+              </p>
+            </div>
+          </div>
         </div>
-      </main>
-    </div>
+      </div>
+
+      {/* CLIENT QUOTES (light) */}
+      <div className="band light">
+        <div className="wrap" data-reveal>
+          <p className="label">What organisers say</p>
+          <p
+            className="mono"
+            style={{ marginTop: 20, color: "rgba(20,20,20,.62)" }}
+          >
+            Rated 5.0 from 11 reviews.
+          </p>
+          <div className="quotes trio">
+            <blockquote>
+              <p>
+                &ldquo;I&rsquo;ve heard plenty of talks about AI, and never
+                found it more captivating or relevant than yours.&rdquo;
+              </p>
+              <cite>Rikke Ekelund</cite>
+            </blockquote>
+            <blockquote>
+              <p>
+                &ldquo;He inspired us all. Not a generic set of examples, but
+                real, recent insight - told with genuine care for the work we
+                do.&rdquo;
+              </p>
+              <cite>Marc Amin</cite>
+            </blockquote>
+            <blockquote>
+              <p>
+                &ldquo;Thank you for an extremely exciting talk - on a topic
+                every company will relate to. Exciting to think about where
+                we&rsquo;ll be in 5 years: we must see opportunities, not
+                limitations.&rdquo;
+              </p>
+              <cite>
+                Gitte Taulov Rude, Senior Business Advisor, Danske Bank
+              </cite>
+            </blockquote>
+          </div>
+        </div>
+      </div>
+
+      {/* FEATURED AI NEWS (dark) */}
+      <div className="band dark">
+        <div className="wrap" data-reveal>
+          <div className="sec-head">
+            <div>
+              <p className="label">Updated every day</p>
+              <h2 className="display-l">
+                Today in AI - 5 curated news stories that matter
+              </h2>
+            </div>
+            <p className="note">Curated by Tim, every morning.</p>
+          </div>
+          <ol className="newslist">
+            {today.stories.map((s, i) => (
+              <li key={s.h}>
+                <span className="num">{String(i + 1).padStart(2, "0")}</span>
+                <div>
+                  <h3 className="display-s">{s.h}</h3>
+                  <p className="dek">{s.p}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+          <div className="sec-foot">
+            <Link className="btn" href="/news">
+              All AI news &rarr;
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* LATEST FROM LINKEDIN (light) */}
+      <div className="band light">
+        <div className="wrap" data-reveal>
+          <div className="sec-head">
+            <div>
+              <p className="label">From LinkedIn</p>
+              <h2 className="display-l">Latest posts</h2>
+            </div>
+            <Link className="arrow" href="/news">
+              See all &rarr;
+            </Link>
+          </div>
+          <div className="li-grid">
+            {posts.map((p) => (
+              <a
+                key={p.url}
+                className="li-card"
+                href={p.url}
+                target="_blank"
+                rel="noopener"
+              >
+                <div className="feedmeta" style={{ margin: 0 }}>
+                  <span className="tag">{p.tag}</span>
+                  <span className="date">{p.date}</span>
+                </div>
+                <p>{p.text}</p>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* BOOKING CTA (dark) */}
+      <div
+        className="band dark thin"
+        style={{ paddingBlock: "clamp(48px,6vw,72px)" }}
+      >
+        <div className="wrap cta-band" data-reveal>
+          <h2 className="display-m">Book Tim to speak</h2>
+          <Link className="btn" href="/speaking#book">
+            Book Tim &rarr;
+          </Link>
+        </div>
+      </div>
+    </>
   );
 }

@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# timfrankandersen.com
 
-## Getting Started
+Tim Frank Andersen's personal website - keynote speaker & moderator on AI and
+technology. Next.js (App Router), deployed on Vercel.
 
-First, run the development server:
+Design + content spec: `BUILD-BRIEF.md` in the iCloud folder
+`Jobs/Claude Code/tfa-site-mockups/` (plus the approved HTML prototype).
+
+## Local development
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # http://localhost:3000
+npm run build      # production build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Content
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Content | Source today | Production source |
+|---|---|---|
+| Daily 5 AI stories | `data/news-days.json` (sample, auto-dated) | Notion DB fed by the AI Curriculum pipeline |
+| LinkedIn posts | `data/linkedin-posts.json` | Notion DB fed by a daily LinkedIn->RSS sync (manual fallback: paste post URL + text) |
+| Predictions (2026 + archive) | `data/predictions.ts` | Static - edit the file |
+| All page copy | in the page components under `app/` | Static - edit the files |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The Notion integration points live in `lib/content.ts` (marked `TODO(notion)`).
+Until `NOTION_API_KEY` is set, the site serves the bundled sample data.
 
-## Learn More
+## Booking enquiries
 
-To learn more about Next.js, take a look at the following resources:
+`app/api/enquiry/route.ts`. With `RESEND_API_KEY` set, enquiries are emailed
+to tim@frankandersen.com via Resend; without it they are logged server-side
+and the form falls back to showing the direct email address.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Go-live checklist
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **GitHub**: create a repo (e.g. `tfa-website`) and push:
+   `git remote add origin git@github.com:<you>/tfa-website.git && git push -u origin main`
+2. **Vercel**: New Project -> import the repo. Framework auto-detects Next.js.
+3. **Env vars** (Vercel -> Settings -> Environment Variables): copy from
+   `.env.example` - `RESEND_API_KEY` first (booking form), Notion keys when
+   the content databases are ready.
+4. **Domain**: add `timfrankandersen.com` + `www` in Vercel -> Domains, then
+   update DNS at the current registrar. The old Squarespace site stays live
+   until DNS flips - zero downtime.
+5. **Redirects**: old URLs (`/ten-tech-predictions-20xx/...`, `/contact`,
+   etc.) already 301 to the new pages - see `next.config.ts`.
+6. **Verify** the ~38 Medium links in `data/predictions.ts` (manual
+   click-through) and review the prediction summaries.
 
-## Deploy on Vercel
+## House rules
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Never use an em-dash; always a plain hyphen.
+- Palette: cream `#FBF7EF`, ink `#141414`, green `#1E4B3A` - nothing else.
+- Email everywhere: `tim@frankandersen.com`.
