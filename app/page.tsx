@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { getNewsDays, getLinkedInPosts } from "@/lib/content";
 
+// Refresh the news + LinkedIn sections from Notion at most hourly.
+export const revalidate = 3600;
+
 export default async function Home() {
   const [days, posts] = await Promise.all([getNewsDays(), getLinkedInPosts()]);
   const today = days[0];

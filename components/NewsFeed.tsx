@@ -24,7 +24,7 @@ export default function NewsFeed({ days }: { days: NewsDay[] }) {
           &lsaquo;
         </button>
         <span className="news-date" aria-live="polite">
-          {idx === 0 ? `Today · ${day.date}` : day.date}
+          {day.isToday ? `Today · ${day.date}` : day.date}
         </span>
         <button
           className="news-arrow"
