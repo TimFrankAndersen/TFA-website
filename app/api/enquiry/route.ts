@@ -22,7 +22,10 @@ export async function POST(req: Request) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "enquiry@timfrankandersen.com",
+        // Must be an address on a Resend-verified domain.
+        // Until timfrankandersen.com is verified, use the aicurriculum.dk
+        // domain via the ENQUIRY_FROM env var.
+        from: process.env.ENQUIRY_FROM || "enquiry@timfrankandersen.com",
         to: ["tim@frankandersen.com"],
         reply_to: data.email,
         subject: `Booking enquiry: ${data.name}${data.organisation ? ` (${data.organisation})` : ""}`,
