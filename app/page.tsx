@@ -99,7 +99,8 @@ export default async function Home() {
               <p>
                 What&rsquo;s real, what&rsquo;s next, and what&rsquo;s in it
                 for you. Live demos, honest answers, and a look at the next
-                12-24 months.
+                12-24 months, which will change our world more than the past
+                two decades did.
               </p>
             </div>
             <div>
