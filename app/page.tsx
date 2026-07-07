@@ -32,8 +32,9 @@ export default async function Home() {
             </h1>
             <p className="lede">
               I&rsquo;ve worked in tech for 30 years. Right now the big shift
-              is AI - I help organisations understand what&rsquo;s real,
-              what&rsquo;s next, and what&rsquo;s in it for them.
+              is AI -<br className="br-desktop" /> I help organisations
+              understand what&rsquo;s real, what&rsquo;s next, and
+              what&rsquo;s in it for them.
             </p>
             <div className="hero-actions">
               <Link className="btn" href="/speaking#book">

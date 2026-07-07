@@ -144,6 +144,13 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .site-nav a[aria-current="page"]{color:var(--green);border-bottom-color:var(--green)}
 .btn-nav{padding:11px 20px;font-size:.875rem}
 
+/* desktop-only line break (hero lede) */
+.br-desktop{display:none}
+@media (min-width:761px){
+  .br-desktop{display:inline}
+  .hero-b-inner .lede{max-width:68ch}
+}
+
 /* burger button - hidden on desktop */
 .menu-btn{display:none}
 
