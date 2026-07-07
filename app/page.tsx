@@ -25,7 +25,11 @@ export default async function Home() {
             <p className="label">
               Keynote speaker &amp; moderator on AI and technology
             </p>
-            <h1 className="display-xl">Tim Frank Andersen</h1>
+            <h1 className="display-xl">
+              Tim Frank
+              <br />
+              Andersen
+            </h1>
             <p className="lede">
               I&rsquo;ve worked in tech for 30 years. Right now the big shift
               is AI - I help organisations understand what&rsquo;s real,
