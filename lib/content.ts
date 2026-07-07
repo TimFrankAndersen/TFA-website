@@ -66,6 +66,7 @@ type RichText = {
 type NotionBlock = {
   type: string;
   paragraph?: { rich_text: RichText[] };
+  heading_3?: { rich_text: RichText[] };
 };
 type NotionPage = {
   id: string;
@@ -116,29 +117,46 @@ function formatMonthYear(iso: string): string {
 /* ------------------------------------------------------------------ */
 
 /**
- * Parses a day-page's blocks into stories. The pipeline writes each story
- * as: a paragraph starting with a BOLD headline (optionally followed by a
- * plain marker like "(top)"), then a plain summary paragraph, then a
- * link-only source paragraph. Headings and link paragraphs are skipped.
+ * Parses a day-page's blocks into stories. The pipeline's page format has
+ * varied over time, so BOTH known shapes are supported:
+ *  - legacy: a paragraph starting with a BOLD headline (optionally followed
+ *    by a plain marker like "(top)"), then a plain summary paragraph, then
+ *    a link-only source paragraph.
+ *  - current: a heading_3 block per headline (grouped under heading_2
+ *    sections like "Top stories" / "Also today"), then a summary paragraph,
+ *    then a link paragraph.
+ * Section headings (heading_1/heading_2) and link paragraphs are skipped.
  */
 function parseStories(blocks: NotionBlock[]): Story[] {
   const stories: Story[] = [];
   let current: Story | null = null;
 
   for (const block of blocks) {
-    if (block.type !== "paragraph" || !block.paragraph) continue;
-    const rt = block.paragraph.rich_text;
+    const t = block.type;
+    const container =
+      t === "paragraph"
+        ? block.paragraph
+        : t === "heading_3"
+          ? block.heading_3
+          : null;
+    if (!container) continue; // skips heading_1/heading_2 section titles etc.
+    const rt = container.rich_text;
     if (!rt || rt.length === 0) continue;
 
     const startsBold = rt[0].annotations?.bold === true;
     const allLinks = rt.every(
-      (t) => t.href || t.plain_text.trim().startsWith("http")
+      (x) => x.href || x.plain_text.trim().startsWith("http")
     );
 
-    if (startsBold) {
+    if (t === "heading_3") {
+      // current format: heading = story headline
+      current = { h: rt.map((x) => x.plain_text).join("").trim(), p: "" };
+      stories.push(current);
+    } else if (startsBold) {
+      // legacy format: bold-paragraph headline
       const headline = rt
-        .filter((t) => t.annotations?.bold)
-        .map((t) => t.plain_text)
+        .filter((x) => x.annotations?.bold)
+        .map((x) => x.plain_text)
         .join("")
         .trim();
       current = { h: headline, p: "" };
@@ -148,7 +166,7 @@ function parseStories(blocks: NotionBlock[]): Story[] {
     } else if (allLinks) {
       continue; // source-link paragraph
     } else if (current && !current.p) {
-      current.p = rt.map((t) => t.plain_text).join("").trim();
+      current.p = rt.map((x) => x.plain_text).join("").trim();
     }
     if (stories.length >= 5 && stories[4].p) break;
   }
