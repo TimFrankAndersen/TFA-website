@@ -6,8 +6,18 @@ import type { NewsDay } from "@/lib/content";
 /**
  * Date-stepped daily feed. Convention (Tim's call): the RIGHT arrow goes
  * BACK in time (older), the LEFT arrow goes forward toward today.
+ *
+ * Two visual variants:
+ *  - "stories" (default): the /news page's article list with tag + date
+ *  - "numbered": the homepage's big-number editorial list
  */
-export default function NewsFeed({ days }: { days: NewsDay[] }) {
+export default function NewsFeed({
+  days,
+  variant = "stories",
+}: {
+  days: NewsDay[];
+  variant?: "stories" | "numbered";
+}) {
   const [idx, setIdx] = useState(0);
   const day = days[idx];
 
@@ -37,18 +47,32 @@ export default function NewsFeed({ days }: { days: NewsDay[] }) {
         </button>
       </div>
 
-      <div>
-        {day.stories.map((s) => (
-          <article className="story" key={s.h}>
-            <div className="feedmeta">
-              <span className="tag">AI News</span>
-              <span className="date">{day.date}</span>
-            </div>
-            <h3 className="display-s">{s.h}</h3>
-            <p>{s.p}</p>
-          </article>
-        ))}
-      </div>
+      {variant === "numbered" ? (
+        <ol className="newslist">
+          {day.stories.map((s, i) => (
+            <li key={s.h}>
+              <span className="num">{String(i + 1).padStart(2, "0")}</span>
+              <div>
+                <h3 className="display-s">{s.h}</h3>
+                <p className="dek">{s.p}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <div>
+          {day.stories.map((s) => (
+            <article className="story" key={s.h}>
+              <div className="feedmeta">
+                <span className="tag">AI News</span>
+                <span className="date">{day.date}</span>
+              </div>
+              <h3 className="display-s">{s.h}</h3>
+              <p>{s.p}</p>
+            </article>
+          ))}
+        </div>
+      )}
     </>
   );
 }

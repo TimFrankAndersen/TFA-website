@@ -1,4 +1,5 @@
 import Link from "next/link";
+import NewsFeed from "@/components/NewsFeed";
 import { getNewsDays, getLinkedInPosts } from "@/lib/content";
 
 // Refresh the news + LinkedIn sections from Notion at most hourly.
@@ -6,7 +7,6 @@ export const revalidate = 3600;
 
 export default async function Home() {
   const [days, posts] = await Promise.all([getNewsDays(), getLinkedInPosts()]);
-  const today = days[0];
 
   return (
     <>
@@ -169,17 +169,7 @@ export default async function Home() {
             </div>
             <p className="note">Curated by Tim, every morning.</p>
           </div>
-          <ol className="newslist">
-            {today.stories.map((s, i) => (
-              <li key={s.h}>
-                <span className="num">{String(i + 1).padStart(2, "0")}</span>
-                <div>
-                  <h3 className="display-s">{s.h}</h3>
-                  <p className="dek">{s.p}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
+          <NewsFeed days={days} variant="numbered" />
           <div className="sec-foot">
             <Link className="btn" href="/news">
               All AI news &rarr;
