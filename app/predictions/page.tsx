@@ -40,19 +40,18 @@ export default function PredictionsPage() {
               </li>
             ))}
           </ol>
-        </div>
-      </div>
 
-      {/* CTA (light) - from the prototype */}
-      <div
-        className="band light thin"
-        style={{ paddingBlock: "clamp(48px,6vw,72px)" }}
-      >
-        <div className="wrap cta-band" data-reveal>
-          <h2 className="display-m">Disagree with any of these? Good.</h2>
-          <Link className="btn" href="/speaking#book">
-            Book Tim <span className="ar">&rarr;</span>
-          </Link>
+          {/* CTA - from the prototype, inside the dark band after nr 10 */}
+          <div
+            className="cta-band"
+            data-reveal
+            style={{ marginTop: "clamp(48px,7vw,80px)" }}
+          >
+            <h2 className="display-l">Disagree with any of these? Good.</h2>
+            <Link className="btn" href="/speaking#book">
+              Book Tim <span className="ar">&rarr;</span>
+            </Link>
+          </div>
         </div>
       </div>
 
