@@ -66,7 +66,7 @@ export default function AboutPage() {
                 <li>
                   <span className="y">2017</span>
                   <span className="e">
-                    In2media became Charlie Tango, acquired by KMD
+                    In2media acquired by KMD, renamed Charlie Tango
                   </span>
                 </li>
                 <li>
@@ -95,7 +95,8 @@ export default function AboutPage() {
                 He co-founded the media company WHERE2GO (acquired by Aller in
                 2005), and from 2006 to 2020 served as partner and executive
                 chairman of In2media, one of Denmark&rsquo;s largest digital
-                agency groups (sold to KMD, later CharlieTango). In 2020 he
+                agency groups (acquired by KMD and renamed Charlie Tango in
+                2017). In 2020 he
                 co-founded the SaaS company Liveshopper, backed by BOOZT, and
                 in 2023 co-founded Institute of AI, where he now helps
                 organisations build their AI strategy.
