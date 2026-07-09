@@ -38,8 +38,10 @@ export default async function NewsPage() {
             <div>
               <p className="label">Today&rsquo;s 5 curated stories</p>
               <h2 className="display-l">The five that matter</h2>
+              <p className="note" style={{ marginTop: 16 }}>
+                Browse back through the last few days.
+              </p>
             </div>
-            <p className="note">Browse back through the last few days.</p>
           </div>
           <NewsFeed days={days} />
         </div>

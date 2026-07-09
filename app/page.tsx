@@ -167,8 +167,10 @@ export default async function Home() {
               <h2 className="display-l">
                 Today in AI - 5 curated news stories that matter
               </h2>
+              <p className="note" style={{ marginTop: 16 }}>
+                Curated by Tim, every morning.
+              </p>
             </div>
-            <p className="note">Curated by Tim, every morning.</p>
           </div>
           <NewsFeed days={days} variant="numbered" />
           <div className="sec-foot">
