@@ -53,7 +53,7 @@ export default function CurriculumPage() {
         <div className="wrap" data-reveal>
           <p className="label">AI Curriculum</p>
           <h1 className="display-xl" style={{ margin: "24px 0 26px" }}>
-            How do I keep up to speed with AI?
+            How do you keep up to speed with AI?
           </h1>
           <p className="lede" style={{ maxWidth: "60ch" }}>
             AI Curriculum keeps executive leaders updated on AI.
