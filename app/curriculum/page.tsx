@@ -197,11 +197,11 @@ export default function CurriculumPage() {
               target="_blank"
               rel="noopener"
             >
-              Try AI Curriculum &rarr;
+              Try AI Curriculum <span className="ar">&rarr;</span>
             </a>
             <Link className="arrow" href="/speaking#book">
               Rolling it out to a leadership team? It pairs well with a
-              keynote &rarr;
+              keynote <span className="ar">&rarr;</span>
             </Link>
           </div>
         </div>

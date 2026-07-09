@@ -26,9 +26,12 @@ export default async function Home() {
               Keynote speaker &amp; moderator on AI and technology
             </p>
             <h1 className="display-xl">
-              Tim Frank
-              <br />
-              Andersen
+              <span className="hl">
+                <span>Tim Frank</span>
+              </span>
+              <span className="hl">
+                <span>Andersen</span>
+              </span>
             </h1>
             <p className="lede">
               I&rsquo;ve worked in tech for 30 years. Right now the big shift
@@ -41,7 +44,7 @@ export default async function Home() {
                 Book Tim
               </Link>
               <Link className="arrow" href="/news">
-                See today&rsquo;s AI news &rarr;
+                See today&rsquo;s AI news <span className="ar">&rarr;</span>
               </Link>
             </div>
           </div>
@@ -72,7 +75,7 @@ export default async function Home() {
                 brands.
               </h2>
               <Link className="arrow" href="/about">
-                More about Tim &rarr;
+                More about Tim <span className="ar">&rarr;</span>
               </Link>
             </div>
           </div>
@@ -88,7 +91,7 @@ export default async function Home() {
               <h2 className="display-l">Two ways to book Tim</h2>
             </div>
             <Link className="arrow" href="/speaking">
-              See speaking &rarr;
+              See speaking <span className="ar">&rarr;</span>
             </Link>
           </div>
           <div className="formats">
@@ -175,7 +178,7 @@ export default async function Home() {
           <NewsFeed days={days} variant="numbered" />
           <div className="sec-foot">
             <Link className="btn" href="/news">
-              All AI news &rarr;
+              All AI news <span className="ar">&rarr;</span>
             </Link>
           </div>
         </div>
@@ -190,7 +193,7 @@ export default async function Home() {
               <h2 className="display-l">Latest posts</h2>
             </div>
             <Link className="arrow" href="/news">
-              See all &rarr;
+              See all <span className="ar">&rarr;</span>
             </Link>
           </div>
           <div className="li-grid">
@@ -221,7 +224,7 @@ export default async function Home() {
         <div className="wrap cta-band" data-reveal>
           <h2 className="display-m">Book Tim to speak</h2>
           <Link className="btn" href="/speaking#book">
-            Book Tim &rarr;
+            Book Tim <span className="ar">&rarr;</span>
           </Link>
         </div>
       </div>
