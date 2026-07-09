@@ -9,6 +9,7 @@ const LINKS = [
   { href: "/speaking", label: "Speaking" },
   { href: "/news", label: "AI News" },
   { href: "/predictions", label: "Predictions" },
+  { href: "/curriculum", label: "AI Curriculum" },
   { href: "/about", label: "About" },
 ];
 
