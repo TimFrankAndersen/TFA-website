@@ -134,7 +134,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .site-nav a{
   font-family:var(--mono);
   font-size:.6875rem;font-weight:600;
-  text-transform:uppercase;letter-spacing:.16em;
+  text-transform:uppercase;letter-spacing:.16em;word-spacing:-.49em;
   color:var(--ink);text-decoration:none;
   padding:6px 0;
   border-bottom:2px solid transparent;
