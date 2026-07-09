@@ -89,7 +89,7 @@ export default async function NewsPage() {
         <div className="wrap cta-band" data-reveal>
           <h2 className="display-m">Book Tim to speak</h2>
           <Link className="btn" href="/speaking#book">
-            Book Tim &rarr;
+            Book Tim <span className="ar">&rarr;</span>
           </Link>
         </div>
       </div>

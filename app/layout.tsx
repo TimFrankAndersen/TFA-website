@@ -29,7 +29,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <noscript>
-          <style>{`[data-reveal]{opacity:1 !important;transform:none !important}`}</style>
+          <style>{`[data-reveal],[data-reveal] *{opacity:1 !important;transform:none !important}`}</style>
         </noscript>
         <Header />
         <main>{children}</main>

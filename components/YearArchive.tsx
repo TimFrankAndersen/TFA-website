@@ -44,7 +44,7 @@ export default function YearArchive({ years }: { years: ArchiveYear[] }) {
                 target="_blank"
                 rel="noopener"
               >
-                {y.topLink.label} &rarr;
+                {y.topLink.label} <span className="ar">&rarr;</span>
               </a>
             </p>
           )}
@@ -62,7 +62,7 @@ export default function YearArchive({ years }: { years: ArchiveYear[] }) {
                       target="_blank"
                       rel="noopener"
                     >
-                      Read on Medium &rarr;
+                      Read on Medium <span className="ar">&rarr;</span>
                     </a>
                   )}
                 </div>

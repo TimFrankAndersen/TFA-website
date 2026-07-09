@@ -166,7 +166,7 @@ export default function AboutPage() {
                   target="_blank"
                   rel="noopener"
                 >
-                  Explore Institute of AI &rarr;
+                  Explore Institute of AI <span className="ar">&rarr;</span>
                 </a>
               </div>
             </div>
@@ -203,7 +203,7 @@ export default function AboutPage() {
                   target="_blank"
                   rel="noopener"
                 >
-                  About the network &rarr;
+                  About the network <span className="ar">&rarr;</span>
                 </a>
               </div>
             </div>
@@ -233,7 +233,7 @@ export default function AboutPage() {
         <div className="wrap cta-band" data-reveal>
           <h2 className="display-m">Book Tim to speak</h2>
           <Link className="btn" href="/speaking#book">
-            Book Tim &rarr;
+            Book Tim <span className="ar">&rarr;</span>
           </Link>
         </div>
       </div>
