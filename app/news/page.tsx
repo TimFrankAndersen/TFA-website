@@ -37,7 +37,9 @@ export default async function NewsPage() {
           <div className="sec-head" data-reveal>
             <div>
               <p className="label">Today&rsquo;s 5 curated stories</p>
-              <h2 className="display-l">The five that matter</h2>
+              <h2 className="display-l">
+                The five AI news stories that matter today
+              </h2>
               <p className="note" style={{ marginTop: 16 }}>
                 Browse back through the last few days.
               </p>
