@@ -12,30 +12,40 @@ export default function RevealObserver() {
   const pathname = usePathname();
 
   useEffect(() => {
-    const els = Array.from(
-      document.querySelectorAll<HTMLElement>("[data-reveal]:not(.in)")
-    );
-    if (els.length === 0) return;
-
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (reduced.matches || !("IntersectionObserver" in window)) {
-      els.forEach((el) => el.classList.add("in"));
-      return;
-    }
+    const skipMotion = reduced.matches || !("IntersectionObserver" in window);
 
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("in");
-            io.unobserve(entry.target);
-          }
-        });
-      },
-      { rootMargin: "0px 0px -8% 0px", threshold: 0.08 }
-    );
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
+    const io = skipMotion
+      ? null
+      : new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("in");
+                io?.unobserve(entry.target);
+              }
+            });
+          },
+          { rootMargin: "0px 0px -8% 0px", threshold: 0.08 }
+        );
+
+    const observeAll = () => {
+      document
+        .querySelectorAll<HTMLElement>("[data-reveal]:not(.in)")
+        .forEach((el) => (io ? io.observe(el) : el.classList.add("in")));
+    };
+    observeAll();
+
+    // Catch [data-reveal] nodes mounted after this effect ran (Fast
+    // Refresh swaps, late-rendered sections) - unobserved nodes would
+    // otherwise stay invisible. Re-observing a node twice is harmless.
+    const mo = new MutationObserver(observeAll);
+    mo.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      mo.disconnect();
+      io?.disconnect();
+    };
   }, [pathname]);
 
   return null;

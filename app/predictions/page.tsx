@@ -43,6 +43,19 @@ export default function PredictionsPage() {
         </div>
       </div>
 
+      {/* CTA (light) - from the prototype */}
+      <div
+        className="band light thin"
+        style={{ paddingBlock: "clamp(48px,6vw,72px)" }}
+      >
+        <div className="wrap cta-band" data-reveal>
+          <h2 className="display-m">Disagree with any of these? Good.</h2>
+          <Link className="btn" href="/speaking#book">
+            Book Tim <span className="ar">&rarr;</span>
+          </Link>
+        </div>
+      </div>
+
       {/* ARCHIVE INTRO (light, tight) */}
       <div
         className="band light"
@@ -65,19 +78,6 @@ export default function PredictionsPage() {
       <div className="band dark" style={{ paddingTop: "clamp(40px,5vw,64px)" }}>
         <div className="wrap">
           <YearArchive years={ARCHIVE} />
-        </div>
-      </div>
-
-      {/* CTA (light) - from the prototype */}
-      <div
-        className="band light thin"
-        style={{ paddingBlock: "clamp(48px,6vw,72px)" }}
-      >
-        <div className="wrap cta-band" data-reveal>
-          <h2 className="display-m">Disagree with any of these? Good.</h2>
-          <Link className="btn" href="/speaking#book">
-            Book Tim <span className="ar">&rarr;</span>
-          </Link>
         </div>
       </div>
     </>
