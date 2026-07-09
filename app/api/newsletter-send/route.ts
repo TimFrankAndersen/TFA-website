@@ -25,7 +25,11 @@ function copenhagenTodayISO(): string {
   }).format(new Date());
 }
 
-function renderEmail(dateLabel: string, stories: { h: string; p: string }[]) {
+function renderEmail(
+  dateLabel: string,
+  stories: { h: string; p: string }[],
+  assetBase = "https://www.timfrankandersen.com"
+) {
   const mono = "ui-monospace,'SF Mono',Menlo,Consolas,monospace";
   const items = stories
     .map(
@@ -44,16 +48,22 @@ function renderEmail(dateLabel: string, stories: { h: string; p: string }[]) {
 
   return `
 <div style="margin:0;padding:0;background:#FBF7EF">
-  <div style="max-width:600px;margin:0 auto;padding:40px 24px;">
-    <p style="font-family:${mono};font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#1E4B3A;margin:0 0 10px">
-      &#9632;&nbsp; Today in AI &middot; ${dateLabel}
-    </p>
-    <h1 style="font-family:Helvetica,Arial,sans-serif;font-size:24px;line-height:1.2;margin:0 0 8px;color:#141414;font-weight:700">
-      The 5 stories that matter
-    </h1>
-    <p style="font-family:${mono};font-size:11px;letter-spacing:1px;color:#8a877f;margin:0 0 8px">
-      Curated by Tim Frank Andersen
-    </p>
+  <div style="max-width:600px;margin:0 auto;padding:36px 24px;">
+    <!-- masthead -->
+    <div style="text-align:center">
+      <img src="${assetBase}/images/newsletter-portrait.jpg" width="84" height="84" alt="Tim Frank Andersen"
+           style="display:inline-block;border-radius:50%;border:3px solid #1E4B3A" />
+      <div style="width:64px;height:1px;background:#141414;margin:18px auto 16px"></div>
+      <h1 style="font-family:Helvetica,Arial,sans-serif;font-size:26px;line-height:1.15;margin:0 0 10px;color:#141414;font-weight:700">
+        5 AI stories that matter
+      </h1>
+      <p style="font-family:${mono};font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#1E4B3A;margin:0 0 4px">
+        &#9632;&nbsp; Today in AI &middot; ${dateLabel}
+      </p>
+      <p style="font-family:${mono};font-size:11px;letter-spacing:1px;color:#8a877f;margin:0 0 6px">
+        Curated by Tim Frank Andersen
+      </p>
+    </div>
     <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse">${items}</table>
     <p style="margin:34px 0 0">
       <a href="https://www.timfrankandersen.com/news"
@@ -84,6 +94,27 @@ export async function GET(req: NextRequest) {
   const today = days[0];
   if (!today?.isToday || today.stories.length === 0) {
     return NextResponse.json({ ok: true, sent: false, reason: "no stories for today yet" });
+  }
+
+  // Test mode (?test=1): one-off email to the owner, bypassing the
+  // broadcast + dedup, for judging template changes in a real inbox.
+  const params = new URL(req.url).searchParams;
+  if (params.get("test") === "1") {
+    const res = await fetch(`${RESEND_API}/emails`, {
+      method: "POST",
+      headers: headers(),
+      body: JSON.stringify({
+        from: process.env.NEWSLETTER_FROM ?? "news@timfrankandersen.com",
+        to: "tim@frankandersen.com",
+        subject: `[TEST] Today in AI: ${today.stories[0].h}`,
+        html: renderEmail(
+          today.date,
+          today.stories,
+          params.get("base") ?? undefined
+        ).replace("{{{RESEND_UNSUBSCRIBE_URL}}}", "#"),
+      }),
+    });
+    return NextResponse.json({ ok: res.ok, test: true });
   }
 
   // 2. Idempotency: one named broadcast per Copenhagen day.
