@@ -3,7 +3,7 @@ import NewsFeed from "@/components/NewsFeed";
 import { getNewsDays, getLinkedInPosts } from "@/lib/content";
 
 // Refresh the news + LinkedIn sections from Notion at most hourly.
-export const revalidate = 3600;
+export const revalidate = 600;
 
 export default async function Home() {
   const [days, posts] = await Promise.all([getNewsDays(), getLinkedInPosts()]);

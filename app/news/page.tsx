@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 // Re-render at most once an hour so "today" stays fresh.
-export const revalidate = 3600;
+export const revalidate = 600;
 
 export default async function NewsPage() {
   const [days, posts] = await Promise.all([getNewsDays(), getLinkedInPosts()]);

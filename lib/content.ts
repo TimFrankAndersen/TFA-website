@@ -12,7 +12,7 @@ export type LinkedInPost = {
 
 const DAYS_SHOWN = 4; // today + up to 3 days back in the stepper
 const NOTION_VERSION = "2022-06-28";
-const REVALIDATE_SECONDS = 3600; // refresh from Notion at most hourly
+const REVALIDATE_SECONDS = 600; // refresh from Notion at most every 10 minutes
 
 /* ------------------------------------------------------------------ */
 /* Notion plumbing                                                     */
