@@ -30,6 +30,8 @@ function renderEmail(
   stories: { h: string; p: string }[],
   assetBase = "https://www.timfrankandersen.com"
 ) {
+  // Font stacks mirror the site: --display/--body and --mono in globals.css
+  const sans = "-apple-system,'Helvetica Neue',Helvetica,Arial,sans-serif";
   const mono = "ui-monospace,'SF Mono',Menlo,Consolas,monospace";
   const items = stories
     .map(
@@ -39,8 +41,8 @@ function renderEmail(
         ${String(i + 1).padStart(2, "0")}
       </td>
       <td style="padding:22px 0 0">
-        <p style="margin:0 0 6px;font-family:Helvetica,Arial,sans-serif;font-size:17px;font-weight:700;line-height:1.35;color:#141414">${s.h}</p>
-        <p style="margin:0;font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:1.55;color:#5c594f">${s.p}</p>
+        <p style="margin:0 0 6px;font-family:${sans};font-size:17px;font-weight:700;letter-spacing:-.01em;line-height:1.35;color:#141414">${s.h}</p>
+        <p style="margin:0;font-family:${sans};font-size:15px;line-height:1.55;color:#5c594f">${s.p}</p>
       </td>
     </tr>`
     )
@@ -48,33 +50,35 @@ function renderEmail(
 
   return `
 <div style="margin:0;padding:0;background:#FBF7EF">
-  <div style="max-width:600px;margin:0 auto;padding:36px 24px;">
-    <!-- masthead -->
-    <div style="text-align:center">
-      <img src="${assetBase}/images/newsletter-portrait.jpg" width="84" height="84" alt="Tim Frank Andersen"
-           style="display:inline-block;border-radius:50%;border:3px solid #1E4B3A" />
-      <div style="width:64px;height:1px;background:#141414;margin:18px auto 16px"></div>
-      <h1 style="font-family:Helvetica,Arial,sans-serif;font-size:26px;line-height:1.15;margin:0 0 10px;color:#141414;font-weight:700">
-        5 AI stories that matter
-      </h1>
-      <p style="font-family:${mono};font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#1E4B3A;margin:0 0 4px">
+  <div style="max-width:600px;margin:0 auto;padding:0 0 36px;">
+    <!-- masthead: photo strip, then site-style label + headline -->
+    <img src="${assetBase}/images/newsletter-banner.jpg" width="600" alt="Tim Frank Andersen"
+         style="display:block;width:100%;height:auto" />
+    <div style="padding:26px 24px 0">
+      <p style="font-family:${mono};font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#1E4B3A;margin:0 0 12px">
         &#9632;&nbsp; Today in AI &middot; ${dateLabel}
       </p>
-      <p style="font-family:${mono};font-size:11px;letter-spacing:1px;color:#8a877f;margin:0 0 6px">
+      <h1 style="font-family:${sans};font-size:30px;letter-spacing:-.03em;line-height:1.05;margin:0 0 10px;color:#141414;font-weight:700">
+        5 AI stories that matter
+      </h1>
+      <p style="font-family:${mono};font-size:11px;font-weight:600;letter-spacing:1px;color:#8a877f;margin:0 0 18px">
         Curated by Tim Frank Andersen
       </p>
+      <div style="height:1px;background:#e5e0d5"></div>
     </div>
-    <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse">${items}</table>
-    <p style="margin:34px 0 0">
-      <a href="https://www.timfrankandersen.com/news"
-         style="font-family:Helvetica,Arial,sans-serif;font-size:15px;font-weight:700;color:#1E4B3A">
-        Read on the site &rarr;</a>
-    </p>
-    <p style="font-family:${mono};font-size:10px;letter-spacing:.5px;line-height:1.7;color:#8a877f;margin:36px 0 0;border-top:1px solid #e5e0d5;padding-top:16px">
-      You get this because you signed up at
-      <a href="https://www.timfrankandersen.com" style="color:#8a877f">timfrankandersen.com</a>.
-      &nbsp;<a href="{{{RESEND_UNSUBSCRIBE_URL}}}" style="color:#8a877f">Unsubscribe</a>
-    </p>
+    <div style="padding:0 24px">
+      <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse">${items}</table>
+      <p style="margin:34px 0 0">
+        <a href="https://www.timfrankandersen.com/news"
+           style="font-family:${sans};font-size:15px;font-weight:700;color:#1E4B3A">
+          Read on the site &rarr;</a>
+      </p>
+      <p style="font-family:${mono};font-size:10px;letter-spacing:.5px;line-height:1.7;color:#8a877f;margin:36px 0 0;border-top:1px solid #e5e0d5;padding-top:16px">
+        You get this because you signed up at
+        <a href="https://www.timfrankandersen.com" style="color:#8a877f">timfrankandersen.com</a>.
+        &nbsp;<a href="{{{RESEND_UNSUBSCRIBE_URL}}}" style="color:#8a877f">Unsubscribe</a>
+      </p>
+    </div>
   </div>
 </div>`;
 }
