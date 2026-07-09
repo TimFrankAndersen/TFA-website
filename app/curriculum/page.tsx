@@ -55,9 +55,12 @@ export default function CurriculumPage() {
           <h1 className="display-xl" style={{ margin: "24px 0 26px" }}>
             How do I keep up to speed with AI?
           </h1>
-          <p className="lede">
-            AI Curriculum keeps executive leaders up to speed on AI - curated
-            daily, filtered by role and industry. Built by Institute of AI.
+          <p className="lede" style={{ maxWidth: "60ch" }}>
+            AI Curriculum keeps executive leaders updated on AI.
+            <br />
+            Curated daily, filtered by role and industry.
+            <br />
+            Built by Institute of AI.
           </p>
         </div>
       </div>
