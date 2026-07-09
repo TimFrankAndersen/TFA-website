@@ -40,7 +40,7 @@ export default function SubscribeForm() {
   return (
     <form className="sub-form" onSubmit={onSubmit}>
       <h3 className="display-s" style={{ marginBottom: 18 }}>
-        Want to stay updated on AI in your inbox? Sign up here.
+        Want to stay updated on AI in your inbox?
       </h3>
       {state === "sent" ? (
         <p className="sub-done" role="status">
