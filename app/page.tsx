@@ -1,5 +1,6 @@
 import Link from "next/link";
 import NewsFeed from "@/components/NewsFeed";
+import SubscribeForm from "@/components/SubscribeForm";
 import { getNewsDays, getLinkedInPosts } from "@/lib/content";
 
 // Refresh the news + LinkedIn sections from Notion at most hourly.
@@ -181,6 +182,7 @@ export default async function Home() {
               All AI news <span className="ar">&rarr;</span>
             </Link>
           </div>
+          <SubscribeForm />
         </div>
       </div>
 
