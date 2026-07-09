@@ -177,11 +177,6 @@ export default async function Home() {
             </div>
           </div>
           <NewsFeed days={days} variant="numbered" />
-          <div className="sec-foot">
-            <Link className="btn" href="/news">
-              All AI news <span className="ar">&rarr;</span>
-            </Link>
-          </div>
           <SubscribeForm />
         </div>
       </div>
