@@ -43,14 +43,14 @@ export default function AboutPage() {
                 <li>
                   <span className="y">1995</span>
                   <span className="e">
-                    Founds Networkers, one of Denmark&rsquo;s first web
+                    Founded Networkers, one of Denmark&rsquo;s first digital
                     agencies
                   </span>
                 </li>
                 <li>
                   <span className="y">1999</span>
                   <span className="e">
-                    Merger with Framtidsfabriken; IPO as Framfab
+                    Merged with Framtidsfabriken; IPO as Framfab
                   </span>
                 </li>
                 <li>
@@ -64,14 +64,20 @@ export default function AboutPage() {
                   </span>
                 </li>
                 <li>
+                  <span className="y">2017</span>
+                  <span className="e">
+                    In2media became Charlie Tango, acquired by KMD
+                  </span>
+                </li>
+                <li>
                   <span className="y">2020</span>
                   <span className="e">
-                    Co-founds Liveshopper, backed by BOOZT
+                    Co-founded Liveshopper, backed by BOOZT
                   </span>
                 </li>
                 <li>
                   <span className="y">2023</span>
-                  <span className="e">Co-founds Institute of AI</span>
+                  <span className="e">Co-founded Institute of AI</span>
                 </li>
               </ol>
             </div>
