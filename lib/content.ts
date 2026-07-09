@@ -170,7 +170,15 @@ function parseStories(blocks: NotionBlock[]): Story[] {
     }
     if (stories.length >= 5 && stories[4].p) break;
   }
-  return stories.filter((s) => s.h && s.p).slice(0, 5);
+  return stories
+    .filter((s) => s.h && s.p)
+    .map((s) => ({
+      // Some pipeline runs number the headlines themselves ("1. ...");
+      // the site renders its own numerals, so strip any leading number.
+      h: s.h.replace(/^\d+[.)]\s*/, ""),
+      p: s.p,
+    }))
+    .slice(0, 5);
 }
 
 /**
