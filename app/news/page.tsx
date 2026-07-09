@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import NewsFeed from "@/components/NewsFeed";
+import SubscribeForm from "@/components/SubscribeForm";
 import { getNewsDays, getLinkedInPosts } from "@/lib/content";
 
 export const metadata: Metadata = {
@@ -46,6 +47,7 @@ export default async function NewsPage() {
             </div>
           </div>
           <NewsFeed days={days} />
+          <SubscribeForm />
         </div>
       </div>
 
