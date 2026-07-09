@@ -25,9 +25,12 @@ export default async function NewsPage() {
           <h1 className="display-xl" style={{ margin: "24px 0 26px" }}>
             AI News
           </h1>
-          <p className="lede">
-            Refreshed daily. Curated by me. Today&rsquo;s five biggest AI
-            stories, plus my latest posts from LinkedIn.
+          <p className="lede" style={{ maxWidth: "60ch" }}>
+            Refreshed daily. Curated by me.
+            <br />
+            Today&rsquo;s five biggest AI stories,
+            <br />
+            plus my latest posts from LinkedIn.
           </p>
           <SubscribeForm />
         </div>
