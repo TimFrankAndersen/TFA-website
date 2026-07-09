@@ -29,6 +29,7 @@ export default async function NewsPage() {
             Refreshed daily. Curated by me. Today&rsquo;s five biggest AI
             stories, plus my latest posts from LinkedIn.
           </p>
+          <SubscribeForm />
         </div>
       </div>
 
@@ -47,7 +48,6 @@ export default async function NewsPage() {
             </div>
           </div>
           <NewsFeed days={days} />
-          <SubscribeForm />
         </div>
       </div>
 

@@ -39,9 +39,9 @@ export default function SubscribeForm() {
 
   return (
     <form className="sub-form" onSubmit={onSubmit}>
-      <p className="label" style={{ marginBottom: 14 }}>
-        Want the daily 5 in your inbox?
-      </p>
+      <h3 className="display-s" style={{ marginBottom: 18 }}>
+        Want to stay updated on AI in your inbox? Sign up here.
+      </h3>
       {state === "sent" ? (
         <p className="sub-done" role="status">
           Almost there - check your inbox and click the confirmation link.
