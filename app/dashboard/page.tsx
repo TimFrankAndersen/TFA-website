@@ -149,8 +149,8 @@ export default async function DashboardPage({
       <div className="band light">
         <div className="wrap">
           <p className="label">Dashboard</p>
-          <h1 className="display-l" style={{ margin: "20px 0" }}>Adgang kraever noegle</h1>
-          <p className="lede">Tilfoej ?key=... til adressen.</p>
+          <h1 className="display-l" style={{ margin: "20px 0" }}>Adgang kræver nøgle</h1>
+          <p className="lede">Tilføj ?key=... til adressen.</p>
         </div>
       </div>
     );
@@ -193,11 +193,11 @@ export default async function DashboardPage({
 
           <div className="dash-two">
             <div className="dash-card">
-              <p className="label" style={{ marginBottom: 16 }}>Besoegende - 14 dage</p>
+              <p className="label" style={{ marginBottom: 16 }}>Besøgende - 14 dage</p>
               <Bars data={a.days as Row[]} labelKey="day" valueKey="visitors" />
             </div>
             <div className="dash-card">
-              <p className="label" style={{ marginBottom: 16 }}>Doegnrytme - visninger pr. time (7d)</p>
+              <p className="label" style={{ marginBottom: 16 }}>Døgnrytme - visninger pr. time (7d)</p>
               <Bars
                 data={Array.from({ length: 24 }, (_, h) => ({
                   hour: h,
@@ -214,7 +214,7 @@ export default async function DashboardPage({
               <p className="label" style={{ marginBottom: 12 }}>Mest sete sider (30d)</p>
               <Table rows={a.pages as Row[]} cols={[
                 { key: "path", label: "Side" },
-                { key: "visitors", label: "Besoegende", right: true },
+                { key: "visitors", label: "Besøgende", right: true },
                 { key: "views", label: "Visninger", right: true },
               ]} />
             </div>
@@ -230,7 +230,7 @@ export default async function DashboardPage({
                 <p className="label" style={{ marginBottom: 12 }}>Lande (30d)</p>
                 <Table rows={a.countries as Row[]} cols={[
                   { key: "country", label: "Land" },
-                  { key: "visitors", label: "Besoegende", right: true },
+                  { key: "visitors", label: "Besøgende", right: true },
                 ]} />
               </div>
             </div>
@@ -249,7 +249,7 @@ export default async function DashboardPage({
               <div className="dash-grid">
                 <Kpi label="Aktive abonnenter" value={String(nl.total)} />
                 <Kpi label="Nye - 14 dage" value={String(nl.last14)} />
-                <Kpi label="Ubekraeftede" value={String(nl.pending)} sub="tilmeldt, ikke bekraeftet" />
+                <Kpi label="Ubekræftede" value={String(nl.pending)} sub="tilmeldt, ikke bekræftet" />
                 <Kpi label="Udsendelser" value={String(nl.broadcasts.length)} sub="seneste 7 vist herunder" />
               </div>
               <div className="dash-two">
@@ -279,7 +279,7 @@ export default async function DashboardPage({
                     ]}
                   />
                   <p className="note" style={{ marginTop: 12 }}>
-                    Aabnings- og klikrater: se Resend-dashboardet (ikke i deres API endnu).
+                    Åbnings- og klikrater: se Resend-dashboardet (ikke i deres API endnu).
                   </p>
                 </div>
               </div>
