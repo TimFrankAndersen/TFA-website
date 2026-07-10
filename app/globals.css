@@ -487,6 +487,7 @@ blockquote cite{font-family:var(--mono);font-style:normal;font-size:.6875rem;let
 .dash-bar{width:100%;background:var(--green);min-height:2px;border-radius:3px 3px 0 0}
 .band.light .dash-bar{background:var(--green)}
 .dash-bar-label{font-family:var(--mono);font-size:.5rem;letter-spacing:0;color:var(--dim);margin-top:6px;white-space:nowrap;overflow:hidden;max-width:100%}
+.dash-bar-value{font-family:var(--mono);font-size:.55rem;letter-spacing:0;color:var(--dim);margin-bottom:4px;white-space:nowrap}
 .dash-table{width:100%;border-collapse:collapse;font-size:.85rem}
 .dash-table th{font-family:var(--mono);font-size:.6rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);text-align:left;padding:6px 0;border-bottom:1px solid var(--hair)}
 .dash-table td{padding:8px 0;border-bottom:1px solid var(--hair);word-break:break-all}
