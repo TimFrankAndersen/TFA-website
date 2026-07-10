@@ -77,11 +77,11 @@ function renderEmail(
     </div>
     <div style="padding:0 24px">
       <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse">${items}</table>
-      <p style="font-family:${sans};font-size:16px;line-height:1.6;color:#5c594f;margin:34px 0 0">
+      <p style="font-family:${sans};font-size:13px;font-weight:700;line-height:1.5;color:#141414;margin:34px 0 0">
         Want to go deeper on AI? Explore
         <a href="https://www.timfrankandersen.com/curriculum"
            style="color:#1E4B3A;text-decoration:underline">AI Curriculum</a>,
-        the platform I built to keep leaders up to speed.
+        the platform I built for leaders.
       </p>
       <p style="font-family:${mono};font-size:10px;letter-spacing:.5px;line-height:1.7;color:#8a877f;margin:36px 0 0;border-top:1px solid #e5e0d5;padding-top:16px">
         You get this because you signed up at
@@ -94,9 +94,15 @@ function renderEmail(
 }
 
 export async function GET(req: NextRequest) {
-  // Vercel Cron authenticates with CRON_SECRET; manual runs must match it.
-  const auth = req.headers.get("authorization");
-  if (!process.env.CRON_SECRET || auth !== `Bearer ${process.env.CRON_SECRET}`) {
+  // Vercel Cron authenticates with CRON_SECRET (Bearer header); manual runs
+  // and the browser preview may pass it as ?key= instead.
+  const params = new URL(req.url).searchParams;
+  const secret = process.env.CRON_SECRET;
+  const authed =
+    Boolean(secret) &&
+    (req.headers.get("authorization") === `Bearer ${secret}` ||
+      params.get("key") === secret);
+  if (!authed) {
     return NextResponse.json({ ok: false }, { status: 401 });
   }
   if (!isConfigured()) {
@@ -106,13 +112,27 @@ export async function GET(req: NextRequest) {
   // 1. Today's stories (same source as the site).
   const days = await getNewsDays();
   const today = days[0];
+
+  // Preview mode (?preview=1): render the email as an HTML page for visual
+  // review, using the latest available day so it always shows an example.
+  if (params.get("preview") === "1") {
+    const day = today ?? days[0];
+    const html = renderEmail(
+      day.date,
+      day.stories,
+      params.get("base") ?? undefined
+    ).replace("{{{RESEND_UNSUBSCRIBE_URL}}}", "#");
+    return new NextResponse(html, {
+      headers: { "Content-Type": "text/html; charset=utf-8" },
+    });
+  }
+
   if (!today?.isToday || today.stories.length === 0) {
     return NextResponse.json({ ok: true, sent: false, reason: "no stories for today yet" });
   }
 
   // Test mode (?test=1): one-off email to the owner, bypassing the
   // broadcast + dedup, for judging template changes in a real inbox.
-  const params = new URL(req.url).searchParams;
   if (params.get("test") === "1") {
     const res = await fetch(`${RESEND_API}/emails`, {
       method: "POST",
