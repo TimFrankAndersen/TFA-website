@@ -119,7 +119,8 @@ function Bars({
               {Number(d[valueKey]) > 0 ? String(d[valueKey]) : ""}
             </span>
           )}
-          <div className="dash-bar" style={{ height: `${Math.max(3, (Number(d[valueKey]) / max) * 100)}%` }} />
+          {/* cap at 78% so the value label above always has room */}
+          <div className="dash-bar" style={{ height: `${Math.max(2, (Number(d[valueKey]) / max) * 78)}%` }} />
           <span className="dash-bar-label">{String(d[labelKey])}</span>
         </div>
       ))}
@@ -225,6 +226,7 @@ export default async function DashboardPage({
                 }))}
                 labelKey="hour"
                 valueKey="views"
+                showValues
               />
             </div>
           </div>
