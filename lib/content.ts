@@ -168,7 +168,11 @@ function parseStories(blocks: NotionBlock[]): Story[] {
     } else if (current && !current.p) {
       current.p = rt.map((x) => x.plain_text).join("").trim();
     }
-    if (stories.length >= 5 && stories[4].p) break;
+    // Stop once we have 5 COMPLETE stories (headline + summary). Counting
+    // raw length would include the bold intro line ("Today in AI - <date>"),
+    // which parses as a headline-only phantom and would cut off the real
+    // 5th story one block too early.
+    if (stories.filter((s) => s.p).length >= 5) break;
   }
   return stories
     .filter((s) => s.h && s.p)
