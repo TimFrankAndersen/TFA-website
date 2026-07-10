@@ -29,7 +29,12 @@ export default async function WelcomePage({
         {!failed && (
           <p
             className="note"
-            style={{ marginTop: 22, maxWidth: "60ch", lineHeight: 1.6 }}
+            style={{
+              marginTop: 22,
+              maxWidth: "60ch",
+              lineHeight: 1.6,
+              fontSize: "0.9375rem",
+            }}
           >
             One quick favour: reply &ldquo;hi&rdquo; or add{" "}
             <a
@@ -43,8 +48,10 @@ export default async function WelcomePage({
             >
               news@timfrankandersen.com
             </a>{" "}
-            to your contacts. It tells your inbox we&rsquo;re friends, so the
-            daily 5 always land up top and never in spam.
+            to your contacts.
+            <br />
+            It tells your inbox we&rsquo;re friends, so the daily 5 always land
+            up top and never in spam.
           </p>
         )}
         <div className="hero-actions" style={{ marginTop: 38 }}>
