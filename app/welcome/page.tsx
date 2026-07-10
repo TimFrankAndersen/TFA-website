@@ -28,12 +28,12 @@ export default async function WelcomePage({
         </p>
         {!failed && (
           <p
-            className="note"
             style={{
               marginTop: 22,
               maxWidth: "60ch",
               lineHeight: 1.6,
-              fontSize: "0.9375rem",
+              fontSize: "1.0625rem",
+              color: "rgba(20,20,20,.66)",
             }}
           >
             One quick favour: reply &ldquo;hi&rdquo; or add{" "}
@@ -47,11 +47,11 @@ export default async function WelcomePage({
               }}
             >
               news@timfrankandersen.com
-            </a>{" "}
-            to your contacts.
+            </a>
             <br />
-            It tells your inbox we&rsquo;re friends, so the daily 5 always land
-            up top and never in spam.
+            to your contacts. It tells your inbox we&rsquo;re friends,
+            <br />
+            so the daily 5 always land up top and never in spam.
           </p>
         )}
         <div className="hero-actions" style={{ marginTop: 38 }}>
