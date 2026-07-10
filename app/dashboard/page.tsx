@@ -274,17 +274,26 @@ export default async function DashboardPage({
                 <Kpi label="Aktive abonnenter" value={String(nl.total)} />
                 <Kpi label="Nye - 14 dage" value={String(nl.last14)} />
                 <Kpi label="Ubekræftede" value={String(nl.pending)} sub="tilmeldt, ikke bekræftet" />
-                <div className="dash-card" style={nl.total >= 90 ? { borderColor: "#c2543c" } : undefined}>
-                  <p className="label" style={{ marginBottom: 10 }}>Gratis-grænsen</p>
-                  <p className="dash-big" style={nl.total >= 90 ? { color: "#c2543c" } : undefined}>
-                    {nl.total} / 100
-                  </p>
-                  <p className="note" style={{ marginTop: 4 }}>
-                    {nl.total >= 90
-                      ? "Opgrader Resend til Pro NU - udsendelsen rammer loftet"
-                      : "Resend gratis: max 100 mails pr. dag"}
-                  </p>
-                </div>
+                {(() => {
+                  // Resend Pro: 50,000 emails/month. Daily broadcast ~= active
+                  // subscribers, so estimated monthly volume = active * 31.
+                  const est = nl.total * 31;
+                  const cap = 50000;
+                  const warn = est >= cap * 0.9;
+                  return (
+                    <div className="dash-card" style={warn ? { borderColor: "#c2543c" } : undefined}>
+                      <p className="label" style={{ marginBottom: 10 }}>Plan-forbrug (Pro)</p>
+                      <p className="dash-big" style={warn ? { color: "#c2543c" } : undefined}>
+                        {Math.round((est / cap) * 100)}%
+                      </p>
+                      <p className="note" style={{ marginTop: 4 }}>
+                        {warn
+                          ? `~${est.toLocaleString("da-DK")} af 50.000 mails/md - opgradering nødvendig snart`
+                          : `~${est.toLocaleString("da-DK")} af 50.000 mails/md - plads til ~1.600 abonnenter`}
+                      </p>
+                    </div>
+                  );
+                })()}
               </div>
               <div className="dash-two">
                 <div className="dash-card">
