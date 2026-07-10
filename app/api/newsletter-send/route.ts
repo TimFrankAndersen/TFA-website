@@ -61,17 +61,27 @@ function renderEmail(
       <h1 style="font-family:${sans};font-size:30px;letter-spacing:-.03em;line-height:1.05;margin:0 0 10px;color:#141414;font-weight:700">
         5 AI stories that matter
       </h1>
-      <p style="font-family:${mono};font-size:11px;font-weight:600;letter-spacing:1px;color:#8a877f;margin:0 0 18px">
-        Curated by Tim Frank Andersen
-      </p>
+      <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;margin:0 0 18px">
+        <tr>
+          <td style="font-family:${mono};font-size:11px;font-weight:600;letter-spacing:1px;color:#8a877f;vertical-align:baseline">
+            Curated by Tim Frank Andersen
+          </td>
+          <td align="right" style="vertical-align:baseline">
+            <a href="https://www.timfrankandersen.com/news"
+               style="font-family:${sans};font-size:13px;font-weight:700;color:#1E4B3A;text-decoration:none;white-space:nowrap">
+              Read on the site &rarr;</a>
+          </td>
+        </tr>
+      </table>
       <div style="height:1px;background:#e5e0d5"></div>
     </div>
     <div style="padding:0 24px">
       <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse">${items}</table>
-      <p style="margin:34px 0 0">
-        <a href="https://www.timfrankandersen.com/news"
-           style="font-family:${sans};font-size:15px;font-weight:700;color:#1E4B3A">
-          Read on the site &rarr;</a>
+      <p style="font-family:${sans};font-size:16px;line-height:1.6;color:#5c594f;margin:34px 0 0">
+        Want to go deeper on AI? Explore
+        <a href="https://www.timfrankandersen.com/curriculum"
+           style="color:#1E4B3A;text-decoration:underline">AI Curriculum</a>,
+        the platform I built to keep leaders up to speed.
       </p>
       <p style="font-family:${mono};font-size:10px;letter-spacing:.5px;line-height:1.7;color:#8a877f;margin:36px 0 0;border-top:1px solid #e5e0d5;padding-top:16px">
         You get this because you signed up at
