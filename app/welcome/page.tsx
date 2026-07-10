@@ -26,6 +26,27 @@ export default async function WelcomePage({
             ? "The confirmation link is invalid or expired. Sign up again below and you'll get a fresh one."
             : "From tomorrow morning you'll get the five AI news stories that matter, picked and written every day. See you in the inbox."}
         </p>
+        {!failed && (
+          <p
+            className="note"
+            style={{ marginTop: 22, maxWidth: "60ch", lineHeight: 1.6 }}
+          >
+            One quick favour: reply &ldquo;hi&rdquo; or add{" "}
+            <a
+              href="mailto:news@timfrankandersen.com"
+              style={{
+                color: "var(--green)",
+                textDecoration: "underline",
+                textDecorationThickness: "2px",
+                textUnderlineOffset: "3px",
+              }}
+            >
+              news@timfrankandersen.com
+            </a>{" "}
+            to your contacts. It tells your inbox we&rsquo;re friends, so the
+            daily 5 always land up top and never in spam.
+          </p>
+        )}
         <div className="hero-actions" style={{ marginTop: 38 }}>
           <Link className="btn" href="/news">
             {failed ? "Back to AI news" : "Read today's 5 now"}{" "}
