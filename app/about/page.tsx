@@ -230,9 +230,8 @@ export default function AboutPage() {
         <div className="wrap" data-reveal>
           <p className="label">Investments</p>
           <h2 className="display-m" style={{ margin: "20px 0 14px" }}>
-            Over the years I have invested in startups -
-            <br />
-            and exited quite a few.
+            Over the years I have invested in startups
+            <br />- and exited quite a few.
           </h2>
           <p className="lede" style={{ marginBottom: 34 }}>
             Besides my co-ownership of Institute of AI, this is my current
