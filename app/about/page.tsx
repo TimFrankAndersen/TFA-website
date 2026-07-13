@@ -110,7 +110,7 @@ export default function AboutPage() {
                 Chinese) and <em>10 Digital Strategies</em> (2014). For eight
                 years he appeared biweekly as the technology expert on
                 Denmark&rsquo;s national morning show, and in 2007 hosted the
-                TV2 series <em>Denmark&rsquo;s Best Idea</em>.
+                TV2 series <em style={{ whiteSpace: "nowrap" }}>Denmark&rsquo;s Best Idea</em>.
               </p>
             </div>
           </div>
@@ -229,9 +229,10 @@ export default function AboutPage() {
       <div className="band light">
         <div className="wrap" data-reveal>
           <p className="label">Investments</p>
-          <h2 className="display-m" style={{ margin: "20px 0 14px", maxWidth: "26ch" }}>
-            Over the years I have invested in startups - and exited quite a
-            few.
+          <h2 className="display-m" style={{ margin: "20px 0 14px" }}>
+            Over the years I have invested in startups -
+            <br />
+            and exited quite a few.
           </h2>
           <p className="lede" style={{ marginBottom: 34 }}>
             Besides my co-ownership of Institute of AI, this is my current
