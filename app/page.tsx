@@ -71,7 +71,8 @@ export default async function Home() {
             <div>
               <h2 className="display-m" style={{ marginBottom: 26 }}>
                 Thirty years in digital - from founding one of Denmark&rsquo;s
-                first web agencies to co-founding Institute of AI. Author, TV
+                first digital agencies to co-founding Institute of AI. Author,
+                TV
                 tech expert, and advisor to some of the world&rsquo;s biggest
                 brands.
               </h2>

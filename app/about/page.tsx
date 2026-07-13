@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Tim Frank Andersen - 30 years in digital and technology, from founding one of Denmark's first web agencies to co-founding Institute of AI.",
+    "Tim Frank Andersen - 30 years in digital and technology, from founding one of Denmark's first digital agencies to co-founding Institute of AI.",
 };
 
 export default function AboutPage() {
@@ -85,8 +85,8 @@ export default function AboutPage() {
               <p>
                 Tim Frank Andersen holds an M.Sc. in Computer Science and has
                 worked in digital and technology for more than 30 years. In
-                1995 he founded one of Denmark&rsquo;s first standalone web
-                agencies, Networkers, which merged with Sweden&rsquo;s
+                1995 he founded one of Denmark&rsquo;s first standalone
+                digital agencies, Networkers, which merged with Sweden&rsquo;s
                 Framtidsfabriken in 1999 and IPO&rsquo;d on the Swedish Stock
                 Exchange; as Senior Vice President at Framfab he built the
                 brand across 17 countries and 3,500 employees.
