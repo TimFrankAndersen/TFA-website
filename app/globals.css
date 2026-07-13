@@ -144,6 +144,9 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .site-nav a[aria-current="page"]{color:var(--green);border-bottom-color:var(--green)}
 .btn-nav{padding:11px 20px;font-size:.875rem}
 
+/* keep tight phrases together so they never break mid-phrase */
+.keep{white-space:nowrap}
+
 /* desktop-only line break (hero lede) */
 .br-desktop{display:none}
 @media (min-width:761px){
