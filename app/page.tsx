@@ -73,9 +73,8 @@ export default async function Home() {
               <h2 className="display-m" style={{ marginBottom: 26 }}>
                 Thirty years in tech - from founding one of Denmark&rsquo;s
                 first digital agencies to co-founding Institute of AI. Author,
-                TV
-                tech expert, and advisor to some of the world&rsquo;s biggest
-                brands.
+                tech expert on TV, and advisor to some of the world&rsquo;s
+                biggest brands.
               </h2>
               <Link className="arrow" href="/about">
                 More about Tim <span className="ar">&rarr;</span>
