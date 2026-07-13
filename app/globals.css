@@ -406,6 +406,14 @@ a.li-card:hover{border-color:var(--green)}
 .timeline li:last-child{border-bottom:1px solid var(--hair)}
 .timeline .y{font-family:var(--mono);font-size:.6875rem;font-weight:600;letter-spacing:.12em;color:var(--green);min-width:76px}
 .timeline .e{font-size:.95rem}
+/* portfolio variant: wider name column, linked names */
+.portfolio .y{min-width:220px;text-transform:uppercase}
+.portfolio .y a{color:var(--green);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .2s ease}
+.portfolio .y a:hover{border-bottom-color:var(--green)}
+@media (max-width:560px){
+  .portfolio li{flex-direction:column;gap:6px}
+  .portfolio .y{min-width:0}
+}
 
 /* ============ BOOKING FORM ============ */
 .book-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(32px,5vw,80px)}

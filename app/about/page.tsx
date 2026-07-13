@@ -225,9 +225,75 @@ export default function AboutPage() {
         </div>
       </div>
 
-      {/* CTA (light) */}
+      {/* INVESTMENTS (light) */}
+      <div className="band light">
+        <div className="wrap" data-reveal>
+          <p className="label">Investments</p>
+          <h2 className="display-m" style={{ margin: "20px 0 14px", maxWidth: "26ch" }}>
+            Over the years I have invested in startups - and exited quite a
+            few.
+          </h2>
+          <p className="lede" style={{ marginBottom: 34 }}>
+            Besides my co-ownership of Institute of AI, this is my current
+            portfolio.
+          </p>
+          <ol className="timeline portfolio">
+            <li>
+              <span className="y">
+                <a href="https://pentimenti.ai" target="_blank" rel="noopener">Pentimenti</a>
+              </span>
+              <span className="e">
+                Agentic AI that reads tenders and writes the proposal. I also
+                chair the board.
+              </span>
+            </li>
+            <li>
+              <span className="y">
+                <a href="https://omorpho.com" target="_blank" rel="noopener">Omorpho</a>
+              </span>
+              <span className="e">
+                Micro-weighted training gear, founded by former Nike
+                innovation chief Stefan Olander.
+              </span>
+            </li>
+            <li>
+              <span className="y">
+                <a href="https://www.kvantify.com" target="_blank" rel="noopener">Kvantify</a>
+              </span>
+              <span className="e">
+                Quantum software for early drug discovery - Danish deep tech
+                at its best.
+              </span>
+            </li>
+            <li>
+              <span className="y">
+                <a href="https://manyone.com" target="_blank" rel="noopener">Manyone</a>
+              </span>
+              <span className="e">
+                Strategy-design consultancy with 300+ strategists and
+                designers across the globe.
+              </span>
+            </li>
+            <li>
+              <span className="y">
+                <a href="https://www.uglyduckling.ventures" target="_blank" rel="noopener">Ugly Duckling Ventures</a>
+              </span>
+              <span className="e">
+                Nordic pre-seed fund backing B2B software. LP through
+                Institute of AI.
+              </span>
+            </li>
+          </ol>
+          <p className="note" style={{ marginTop: 22 }}>
+            And no, I am not currently looking for new investments - I just
+            like backing people building the future.
+          </p>
+        </div>
+      </div>
+
+      {/* CTA (dark) */}
       <div
-        className="band light thin"
+        className="band dark thin"
         style={{ paddingBlock: "clamp(48px,6vw,72px)" }}
       >
         <div className="wrap cta-band" data-reveal>
