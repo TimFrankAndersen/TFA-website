@@ -1,6 +1,6 @@
 {
   "crons": [
-    { "path": "/api/newsletter-send", "schedule": "0 6 * * *" },
-    { "path": "/api/newsletter-send", "schedule": "30 8 * * *" }
+    { "path": "/api/newsletter-send", "schedule": "30 6 * * *" },
+    { "path": "/api/newsletter-send", "schedule": "0 11 * * *" }
   ]
 }
