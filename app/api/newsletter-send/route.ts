@@ -80,16 +80,16 @@ function renderEmail(
 
       <!-- CTA row: comment lands in Tim's inbox; share opens a ready-made
            mail in the reader's own client (personal recommendation) -->
-      <table role="presentation" cellpadding="0" cellspacing="0" style="margin:36px 0 0">
+      <table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin:36px auto 0">
         <tr>
           <td style="padding-right:12px">
             <a href="mailto:tim@frankandersen.com?subject=${encodeURIComponent("Comment on today's newsletter")}"
-               style="display:inline-block;background:#1E4B3A;color:#FBF7EF;font-family:${sans};font-size:14px;font-weight:700;text-decoration:none;padding:13px 22px">
+               style="display:inline-block;background:#1E4B3A;color:#FBF7EF;font-family:${sans};font-size:14px;font-weight:700;text-decoration:none;padding:13px 22px;border-radius:10px">
               Comment on this newsletter</a>
           </td>
           <td>
             <a href="mailto:?subject=${encodeURIComponent("The 5 AI stories that matter - every morning")}&body=${encodeURIComponent("I get the 5 most important AI news stories every morning, curated by Tim Frank Andersen. Free and takes two minutes to read. Sign up here: https://www.timfrankandersen.com")}"
-               style="display:inline-block;background:#1E4B3A;color:#FBF7EF;font-family:${sans};font-size:14px;font-weight:700;text-decoration:none;padding:13px 22px">
+               style="display:inline-block;background:#1E4B3A;color:#FBF7EF;font-family:${sans};font-size:14px;font-weight:700;text-decoration:none;padding:13px 22px;border-radius:10px">
               Share with a friend</a>
           </td>
         </tr>
