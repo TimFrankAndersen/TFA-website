@@ -77,6 +77,24 @@ function renderEmail(
     </div>
     <div style="padding:0 24px">
       <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse">${items}</table>
+
+      <!-- CTA row: comment lands in Tim's inbox; share opens a ready-made
+           mail in the reader's own client (personal recommendation) -->
+      <table role="presentation" cellpadding="0" cellspacing="0" style="margin:36px 0 0">
+        <tr>
+          <td style="padding-right:12px">
+            <a href="mailto:tim@frankandersen.com?subject=${encodeURIComponent("Comment on today's newsletter")}"
+               style="display:inline-block;background:#1E4B3A;color:#FBF7EF;font-family:${sans};font-size:14px;font-weight:700;text-decoration:none;padding:13px 22px">
+              Comment on this newsletter</a>
+          </td>
+          <td>
+            <a href="mailto:?subject=${encodeURIComponent("The 5 AI stories that matter - every morning")}&body=${encodeURIComponent("I get the 5 most important AI news stories every morning, curated by Tim Frank Andersen. Free and takes two minutes to read. Sign up here: https://www.timfrankandersen.com")}"
+               style="display:inline-block;background:#1E4B3A;color:#FBF7EF;font-family:${sans};font-size:14px;font-weight:700;text-decoration:none;padding:13px 22px">
+              Share with a friend</a>
+          </td>
+        </tr>
+      </table>
+
       <p style="font-family:${sans};font-size:13px;font-weight:700;line-height:1.5;color:#141414;margin:34px 0 0">
         Want to go deeper on AI? Explore
         <a href="https://www.timfrankandersen.com/curriculum"
@@ -87,6 +105,7 @@ function renderEmail(
         You get this because you signed up at
         <a href="https://www.timfrankandersen.com" style="color:#8a877f">timfrankandersen.com</a>.
         &nbsp;<a href="{{{RESEND_UNSUBSCRIBE_URL}}}" style="color:#8a877f">Unsubscribe</a>
+        <br />Got this forwarded? <a href="https://www.timfrankandersen.com" style="color:#1E4B3A">Get your own daily 5 &rarr;</a>
       </p>
     </div>
   </div>
