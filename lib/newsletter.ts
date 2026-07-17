@@ -108,6 +108,9 @@ export async function sendConfirmEmail(email: string, baseUrl: string) {
 
   return resend("/emails", "POST", {
     from: process.env.NEWSLETTER_FROM ?? "news@timfrankandersen.com",
+    // news@ is send-only (no inbound MX on the domain) - replies must
+    // land in Tim's real inbox or they bounce with "No such user here".
+    reply_to: process.env.NEWSLETTER_REPLY_TO ?? "tim@frankandersen.com",
     to: email.trim().toLowerCase(),
     subject: "Confirm your subscription - daily AI news from Tim",
     html,

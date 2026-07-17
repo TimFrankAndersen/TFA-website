@@ -139,6 +139,7 @@ export async function GET(req: NextRequest) {
       headers: headers(),
       body: JSON.stringify({
         from: process.env.NEWSLETTER_FROM ?? "news@timfrankandersen.com",
+        reply_to: process.env.NEWSLETTER_REPLY_TO ?? "tim@frankandersen.com",
         to: "tim@frankandersen.com",
         subject: `[TEST] Today in AI: ${today.stories[0].h}`,
         html: renderEmail(
@@ -166,6 +167,7 @@ export async function GET(req: NextRequest) {
       name,
       audience_id: process.env.RESEND_AUDIENCE_ID,
       from: process.env.NEWSLETTER_FROM ?? "news@timfrankandersen.com",
+      reply_to: process.env.NEWSLETTER_REPLY_TO ?? "tim@frankandersen.com",
       subject: `Today in AI: ${today.stories[0].h}`,
       html: renderEmail(today.date, today.stories),
     }),
