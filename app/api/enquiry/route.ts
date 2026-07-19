@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { rateLimited, clientIp } from "@/lib/ratelimit";
 
 /**
  * Booking enquiry endpoint.
@@ -12,6 +13,20 @@ export async function POST(req: Request) {
   const data = await req.json().catch(() => null);
   if (!data || typeof data.email !== "string" || typeof data.name !== "string") {
     return NextResponse.json({ ok: false }, { status: 400 });
+  }
+
+  // Bot defence 1: honeypot - real visitors never fill the hidden field.
+  // Bot defence 2: time gate - humans take more than 4s to fill the form.
+  // Both return a fake success so bots have nothing to adapt to.
+  const elapsed = Date.now() - Number(data.t ?? 0);
+  if (data.website || !data.t || elapsed < 4000) {
+    console.log("[enquiry] bot dropped (honeypot/time-gate)");
+    return NextResponse.json({ ok: true });
+  }
+
+  // Bot defence 3: max 5 enquiries per IP per hour.
+  if (await rateLimited("enquiry", clientIp(req), 5, 3600)) {
+    return NextResponse.json({ ok: false }, { status: 429 });
   }
 
   if (process.env.RESEND_API_KEY) {

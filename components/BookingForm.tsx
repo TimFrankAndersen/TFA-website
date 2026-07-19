@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
 export default function BookingForm() {
   const [status, setStatus] = useState<Status>("idle");
+  // Bot defence: when the form was rendered (humans take seconds to fill it)
+  const [loadedAt, setLoadedAt] = useState("");
+  useEffect(() => setLoadedAt(String(Date.now())), []);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -34,6 +37,16 @@ export default function BookingForm() {
 
   return (
     <form className="form-grid" onSubmit={onSubmit}>
+      {/* bot defence: hidden honeypot + render timestamp */}
+      <input
+        type="text"
+        name="website"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        className="sub-hp"
+      />
+      <input type="hidden" name="t" value={loadedAt} />
       <div className="field">
         <label htmlFor="bf-name">Name</label>
         <input id="bf-name" name="name" type="text" required />

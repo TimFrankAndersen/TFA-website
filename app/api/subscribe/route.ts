@@ -4,6 +4,7 @@ import {
   addPendingContact,
   sendConfirmEmail,
 } from "@/lib/newsletter";
+import { rateLimited, clientIp } from "@/lib/ratelimit";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -21,6 +22,11 @@ export async function POST(req: NextRequest) {
 
   // Honeypot: real visitors never fill this hidden field.
   if (body.website) return NextResponse.json({ ok: true });
+
+  // Max 10 signup attempts per IP per hour (each one sends a confirm email).
+  if (await rateLimited("subscribe", clientIp(req), 10, 3600)) {
+    return NextResponse.json({ ok: false }, { status: 429 });
+  }
 
   const email = (body.email ?? "").trim().toLowerCase();
   if (!EMAIL_RE.test(email) || email.length > 254) {

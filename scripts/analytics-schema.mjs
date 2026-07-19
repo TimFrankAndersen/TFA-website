@@ -17,3 +17,10 @@ await sql`CREATE INDEX IF NOT EXISTS hits_ts_idx ON hits (ts)`;
 await sql`CREATE INDEX IF NOT EXISTS hits_path_idx ON hits (path)`;
 const r = await sql`SELECT count(*) FROM hits`;
 console.log('schema ok, rows:', r[0].count);
+await sql`CREATE TABLE IF NOT EXISTS rate_events (
+  id bigserial PRIMARY KEY,
+  key text NOT NULL,
+  ts timestamptz NOT NULL DEFAULT now()
+)`;
+await sql`CREATE INDEX IF NOT EXISTS rate_events_key_ts_idx ON rate_events (key, ts)`;
+console.log('rate_events ok');
