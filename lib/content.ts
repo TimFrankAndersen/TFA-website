@@ -177,9 +177,13 @@ function parseStories(blocks: NotionBlock[]): Story[] {
   return stories
     .filter((s) => s.h && s.p)
     .map((s) => ({
-      // Some pipeline runs number the headlines themselves ("1. ...");
-      // the site renders its own numerals, so strip any leading number.
-      h: s.h.replace(/^\d+[.)]\s*/, ""),
+      // Pipeline quirks the site must never render (Tim's rule: nothing in
+      // parentheses in headlines): strip leading self-numbering ("1. ...")
+      // and trailing parenthetical markers like "(top)" / "(also today)".
+      h: s.h
+        .replace(/^\d+[.)]\s*/, "")
+        .replace(/(\s*\([^)]*\))+\s*$/, "")
+        .trim(),
       p: s.p,
     }))
     .slice(0, 5);
