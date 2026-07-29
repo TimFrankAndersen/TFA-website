@@ -19,9 +19,11 @@ body{
   font-family:var(--body);
   font-size:17px;
   line-height:1.6;
-  overflow-x:hidden;
+  overflow-x:clip;
   -webkit-font-smoothing:antialiased;
 }
+/* clip (not hidden) also stops iOS sideways panning when something overflows */
+html{overflow-x:clip}
 [hidden]{display:none !important}
 img,svg{max-width:100%}
 
@@ -486,6 +488,11 @@ blockquote cite{font-family:var(--mono);font-style:normal;font-size:.6875rem;let
 .yr:hover{border-color:var(--green)}
 .yr.active{background:var(--cream);color:var(--ink);border-color:var(--cream)}
 .pred-list .arrow{display:inline-block;margin-top:14px;font-size:.95rem}
+
+/* founders caption: one line on desktop (Tim's call), wraps on mobile so
+   it can never force horizontal overflow */
+.founders-cap{white-space:nowrap}
+@media (max-width:560px){.founders-cap{white-space:normal}}
 
 /* ---- dashboard ---- */
 .dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;margin-bottom:24px}

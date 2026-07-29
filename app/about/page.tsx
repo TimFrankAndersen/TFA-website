@@ -130,12 +130,11 @@ export default function AboutPage() {
                 style={{ display: "block", width: "100%", height: "auto" }}
               />
               <p
-                className="mono"
+                className="mono founders-cap"
                 style={{
                   marginTop: 16,
                   color: "var(--dim)",
                   letterSpacing: ".02em",
-                  whiteSpace: "nowrap",
                 }}
               >
                 Tim and Simon - the two co-founders of Institute of AI
