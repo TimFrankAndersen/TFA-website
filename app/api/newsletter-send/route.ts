@@ -37,7 +37,7 @@ function renderEmail(
     .map(
       (s, i) => `
     <tr>
-      <td style="vertical-align:baseline;padding:22px 18px 0 0;font-family:${mono};font-size:22px;font-weight:700;color:#1E4B3A">
+      <td width="46" style="width:46px;white-space:nowrap;vertical-align:baseline;padding:22px 18px 0 0;font-family:${mono};font-size:22px;font-weight:700;color:#1E4B3A">
         ${String(i + 1).padStart(2, "0")}
       </td>
       <td style="padding:22px 0 0">
