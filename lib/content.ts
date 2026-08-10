@@ -26,9 +26,24 @@ function notionHeaders(): HeadersInit {
   };
 }
 
+/**
+ * Cache policy for a Notion read. The public site is happy with data up to
+ * REVALIDATE_SECONDS old, but the daily newsletter send must never act on a
+ * stale "no stories yet" answer: on days the retry pipeline rescues the
+ * morning run, today's page can be only minutes old, and a cached read makes
+ * the send skip the day silently. That is exactly what happened on
+ * 2026-08-10. See getNewsDays({ fresh: true }).
+ */
+function notionCache(fresh: boolean) {
+  return fresh
+    ? { cache: "no-store" as const }
+    : { next: { revalidate: REVALIDATE_SECONDS } };
+}
+
 async function notionQueryDatabase(
   databaseId: string,
-  body: Record<string, unknown>
+  body: Record<string, unknown>,
+  fresh = false
 ): Promise<{ results: NotionPage[] }> {
   const res = await fetch(
     `https://api.notion.com/v1/databases/${databaseId}/query`,
@@ -36,7 +51,7 @@ async function notionQueryDatabase(
       method: "POST",
       headers: notionHeaders(),
       body: JSON.stringify(body),
-      next: { revalidate: REVALIDATE_SECONDS },
+      ...notionCache(fresh),
     }
   );
   if (!res.ok) {
@@ -45,10 +60,13 @@ async function notionQueryDatabase(
   return res.json();
 }
 
-async function notionPageBlocks(pageId: string): Promise<NotionBlock[]> {
+async function notionPageBlocks(
+  pageId: string,
+  fresh = false
+): Promise<NotionBlock[]> {
   const res = await fetch(
     `https://api.notion.com/v1/blocks/${pageId}/children?page_size=100`,
-    { headers: notionHeaders(), next: { revalidate: REVALIDATE_SECONDS } }
+    { headers: notionHeaders(), ...notionCache(fresh) }
   );
   if (!res.ok) {
     throw new Error(`Notion blocks ${pageId} failed: ${res.status}`);
@@ -195,20 +213,27 @@ function parseStories(blocks: NotionBlock[]): Story[] {
  * fills every morning. Falls back to bundled sample data (stamped with
  * real dates) when Notion is not configured or unreachable.
  */
-export async function getNewsDays(): Promise<NewsDay[]> {
+export async function getNewsDays(
+  opts: { fresh?: boolean } = {}
+): Promise<NewsDay[]> {
+  const fresh = opts.fresh ?? false;
   const dbId = process.env.NOTION_NEWS_DB_ID;
   if (process.env.NOTION_API_KEY && dbId) {
     try {
-      const query = await notionQueryDatabase(dbId, {
-        sorts: [{ property: "Dato", direction: "descending" }],
-        page_size: DAYS_SHOWN,
-      });
+      const query = await notionQueryDatabase(
+        dbId,
+        {
+          sorts: [{ property: "Dato", direction: "descending" }],
+          page_size: DAYS_SHOWN,
+        },
+        fresh
+      );
       const today = copenhagenTodayISO();
       const days = await Promise.all(
         query.results.map(async (page): Promise<NewsDay | null> => {
           const iso = page.properties["Dato"]?.date?.start;
           if (!iso) return null;
-          const stories = parseStories(await notionPageBlocks(page.id));
+          const stories = parseStories(await notionPageBlocks(page.id, fresh));
           if (stories.length === 0) return null;
           return { date: formatISODate(iso), isToday: iso === today, stories };
         })
