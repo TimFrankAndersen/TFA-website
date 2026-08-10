@@ -128,8 +128,12 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: false, reason: "not configured" }, { status: 503 });
   }
 
-  // 1. Today's stories (same source as the site).
-  const days = await getNewsDays();
+  // 1. Today's stories (same source as the site, but read uncached).
+  // The site tolerates a 10-minute-old view of Notion; this endpoint must
+  // not. When the morning pipeline fails and the retry publishes late, a
+  // cached read still says "no stories for today yet" and the day is skipped
+  // with no error anywhere. That cost a send on 2026-08-10.
+  const days = await getNewsDays({ fresh: true });
   const today = days[0];
 
   // Preview mode (?preview=1): render the email as an HTML page for visual
