@@ -124,7 +124,11 @@ function Bars({
           )}
           {/* cap at 78% so the value label above always has room */}
           <div className="dash-bar" style={{ height: `${Math.max(2, (Number(d[valueKey]) / max) * 78)}%` }} />
-          <span className="dash-bar-label">{String(d[labelKey])}</span>
+          <span className="dash-bar-label">
+            {String(d[labelKey]).split(" ").map((part, j) => (
+              <span key={j} className={j > 0 ? "dash-bar-tail" : undefined}>{j > 0 ? " " : ""}{part}</span>
+            ))}
+          </span>
         </div>
       ))}
     </div>
