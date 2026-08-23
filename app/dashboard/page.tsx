@@ -78,13 +78,16 @@ async function newsletter() {
       .slice(0, 7);
     type Contact = { email: string; unsubscribed: boolean; created_at: string };
     const active = (contacts as Contact[]).filter((c) => !c.unsubscribed);
+    const last24h = active.filter(
+      (c) => Date.now() - new Date(c.created_at).getTime() < 86400e3
+    );
     const last14 = active.filter(
       (c) => Date.now() - new Date(c.created_at).getTime() < 14 * 86400e3
     );
     const newest = [...active]
       .sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at))
       .slice(0, 8);
-    return { total: active.length, pending: contacts.length - active.length, last14: last14.length, newest, broadcasts };
+    return { total: active.length, pending: contacts.length - active.length, last24h: last24h.length, last14: last14.length, newest, broadcasts };
   } catch {
     return null;
   }
@@ -200,72 +203,8 @@ export default async function DashboardPage({
         </div>
       </div>
 
-      {/* TRAFIK (dark) */}
+      {/* NYHEDSBREV / LEADS (dark) */}
       <div className="band dark" style={{ paddingBlock: "clamp(40px,5vw,64px)" }}>
-        <div className="wrap">
-          <p className="label" style={{ marginBottom: 24 }}>Trafik</p>
-          <div className="dash-grid">
-            <Kpi label="I dag" value={String(k.visitors_today ?? 0)} sub={`${k.views_today ?? 0} sidevisninger`} />
-            <Kpi label="7 dage" value={String(k.visitors_7d ?? 0)} sub={`${k.views_7d ?? 0} sidevisninger`} />
-            <Kpi label="30 dage" value={String(k.visitors_30d ?? 0)} sub={`${k.views_30d ?? 0} sidevisninger`} />
-            <Kpi label="I alt" value={String(k.visitors_total ?? 0)} sub={`${k.views_total ?? 0} sidevisninger`} />
-            <Kpi label="Tid pr. besøg (7d)" value={fmtSecs(k.avg_visit_secs)} sub="gennemsnit pr. besøgende" />
-          </div>
-
-          <div className="dash-two">
-            <div className="dash-card">
-              <p className="label" style={{ marginBottom: 16 }}>Besøgende - 14 dage</p>
-              <Bars data={a.days as Row[]} labelKey="day" valueKey="visitors" showValues />
-            </div>
-            <div className="dash-card">
-              <p className="label" style={{ marginBottom: 16 }}>Døgnrytme - visninger pr. time (7d)</p>
-              <Bars
-                data={Array.from({ length: 24 }, (_, h) => ({
-                  hour: h,
-                  views: Number((a.hours as Row[]).find((r) => Number(r.hour) === h)?.views ?? 0),
-                }))}
-                labelKey="hour"
-                valueKey="views"
-                showValues
-              />
-            </div>
-          </div>
-
-          <div className="dash-two">
-            <div className="dash-card">
-              <p className="label" style={{ marginBottom: 12 }}>Mest sete sider (30d)</p>
-              <Table rows={(a.pages as Row[]).map((p) => ({
-                ...p,
-                tid: p.avg_secs == null ? "-" : fmtSecs(p.avg_secs),
-              }))} cols={[
-                { key: "path", label: "Side" },
-                { key: "visitors", label: "Besøgende", right: true },
-                { key: "views", label: "Visninger", right: true },
-                { key: "tid", label: "Tid", right: true },
-              ]} />
-            </div>
-            <div>
-              <div className="dash-card" style={{ marginBottom: 20 }}>
-                <p className="label" style={{ marginBottom: 12 }}>Kilder (30d)</p>
-                <Table rows={a.refs as Row[]} cols={[
-                  { key: "referrer", label: "Kilde" },
-                  { key: "views", label: "Visninger", right: true },
-                ]} />
-              </div>
-              <div className="dash-card">
-                <p className="label" style={{ marginBottom: 12 }}>Lande (30d)</p>
-                <Table rows={a.countries as Row[]} cols={[
-                  { key: "country", label: "Land" },
-                  { key: "visitors", label: "Besøgende", right: true },
-                ]} />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* NYHEDSBREV / LEADS (light) */}
-      <div className="band light" style={{ paddingBlock: "clamp(40px,5vw,64px)" }}>
         <div className="wrap">
           <p className="label" style={{ marginBottom: 24 }}>Nyhedsbrev og leads</p>
           {!nl ? (
@@ -274,6 +213,7 @@ export default async function DashboardPage({
             <>
               <div className="dash-grid">
                 <Kpi label="Aktive abonnenter" value={String(nl.total)} />
+                <Kpi label="Nye - 24 timer" value={String(nl.last24h)} />
                 <Kpi label="Nye - 14 dage" value={String(nl.last14)} />
                 <Kpi label="Ubekræftede" value={String(nl.pending)} sub="tilmeldt, ikke bekræftet" />
                 {(() => {
@@ -337,6 +277,70 @@ export default async function DashboardPage({
           )}
         </div>
       </div>
+      {/* TRAFIK (light) */}
+      <div className="band light" style={{ paddingBlock: "clamp(40px,5vw,64px)" }}>
+        <div className="wrap">
+          <p className="label" style={{ marginBottom: 24 }}>Trafik</p>
+          <div className="dash-grid">
+            <Kpi label="I dag" value={String(k.visitors_today ?? 0)} sub={`${k.views_today ?? 0} sidevisninger`} />
+            <Kpi label="7 dage" value={String(k.visitors_7d ?? 0)} sub={`${k.views_7d ?? 0} sidevisninger`} />
+            <Kpi label="30 dage" value={String(k.visitors_30d ?? 0)} sub={`${k.views_30d ?? 0} sidevisninger`} />
+            <Kpi label="I alt" value={String(k.visitors_total ?? 0)} sub={`${k.views_total ?? 0} sidevisninger`} />
+            <Kpi label="Tid pr. besøg (7d)" value={fmtSecs(k.avg_visit_secs)} sub="gennemsnit pr. besøgende" />
+          </div>
+
+          <div className="dash-two">
+            <div className="dash-card">
+              <p className="label" style={{ marginBottom: 16 }}>Besøgende - 14 dage</p>
+              <Bars data={a.days as Row[]} labelKey="day" valueKey="visitors" showValues />
+            </div>
+            <div className="dash-card">
+              <p className="label" style={{ marginBottom: 16 }}>Døgnrytme - visninger pr. time (7d)</p>
+              <Bars
+                data={Array.from({ length: 24 }, (_, h) => ({
+                  hour: h,
+                  views: Number((a.hours as Row[]).find((r) => Number(r.hour) === h)?.views ?? 0),
+                }))}
+                labelKey="hour"
+                valueKey="views"
+                showValues
+              />
+            </div>
+          </div>
+
+          <div className="dash-two">
+            <div className="dash-card">
+              <p className="label" style={{ marginBottom: 12 }}>Mest sete sider (30d)</p>
+              <Table rows={(a.pages as Row[]).map((p) => ({
+                ...p,
+                tid: p.avg_secs == null ? "-" : fmtSecs(p.avg_secs),
+              }))} cols={[
+                { key: "path", label: "Side" },
+                { key: "visitors", label: "Besøgende", right: true },
+                { key: "views", label: "Visninger", right: true },
+                { key: "tid", label: "Tid", right: true },
+              ]} />
+            </div>
+            <div>
+              <div className="dash-card" style={{ marginBottom: 20 }}>
+                <p className="label" style={{ marginBottom: 12 }}>Kilder (30d)</p>
+                <Table rows={a.refs as Row[]} cols={[
+                  { key: "referrer", label: "Kilde" },
+                  { key: "views", label: "Visninger", right: true },
+                ]} />
+              </div>
+              <div className="dash-card">
+                <p className="label" style={{ marginBottom: 12 }}>Lande (30d)</p>
+                <Table rows={a.countries as Row[]} cols={[
+                  { key: "country", label: "Land" },
+                  { key: "visitors", label: "Besøgende", right: true },
+                ]} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </>
   );
 }
