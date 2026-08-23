@@ -1,0 +1,62 @@
+name: Newsletter send
+
+# Punctual daily trigger for /api/newsletter-send, run off Tim's laptop.
+#
+# Why this exists: the 06:30 send used to be a local Claude Code scheduled
+# task, because Vercel Hobby crons only fire "within the hour". A closed
+# MacBook lid wakes the machine for ~45 seconds (DarkWake) and sleeps again,
+# so on 14 August 2026 the task never got far enough to make the call - and
+# never far enough to send its own failure alert either. GitHub runners do
+# not sleep. The Vercel crons (08:30 and 13:00 Copenhagen) stay as backups.
+#
+# The endpoint is idempotent per Copenhagen day - it names each broadcast
+# "daily-YYYY-MM-DD" and skips if that name already exists - so every extra
+# call below is harmless.
+
+on:
+  schedule:
+    # 06:30 Copenhagen all year: 04:30 UTC under CEST, 05:30 UTC under CET.
+    # Both run daily; the out-of-season one lands at 07:30 local and no-ops.
+    - cron: '30 4 * * *'
+    - cron: '30 5 * * *'
+    # Dead man's switch at 09:00 Copenhagen (07:00 UTC CEST / 08:00 UTC CET).
+    # Tries once more, and fails the run if the day still has nothing out.
+    # A failed run emails the repo owner - that alert does not depend on the
+    # laptop, which is the whole point.
+    - cron: '0 7 * * *'
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the secret is configured
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "${CRON_SECRET}" ]; then
+            echo "::error::Repository secret CRON_SECRET is not set - the endpoint will reject every call."
+            exit 1
+          fi
+
+      - name: Call the send endpoint
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          curl -sS --max-time 90 --retry 2 --retry-delay 30 \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            "https://www.timfrankandersen.com/api/newsletter-send" \
+            -o response.json
+          echo "Response: $(cat response.json)"
+
+      - name: Fail if the day still has no newsletter
+        if: contains(fromJSON('["0 7 * * *","0 8 * * *"]'), github.event.schedule)
+        run: |
+          if grep -q '"sent":true' response.json || grep -q 'already sent today' response.json; then
+            echo "Newsletter is out for today."
+          else
+            echo "::error::No newsletter sent today. Endpoint said: $(cat response.json)"
+            exit 1
+          fi
