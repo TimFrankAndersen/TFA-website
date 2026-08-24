@@ -175,10 +175,19 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: res.ok, test: true });
   }
 
-  // 2. Idempotency: one named broadcast per Copenhagen day.
+  // 2. Idempotency: one named broadcast per Copenhagen day. A broadcast that
+  // is sent - or on its way there - blocks the day. One that died does not:
+  // Resend keeps the name on a canceled broadcast, so on 2026-08-24 a
+  // cancelled send kept its name and silently blocked every later attempt,
+  // including both Vercel crons. Canceled and failed broadcasts cannot be
+  // resent or renamed through the API either, so the day was unrecoverable.
   const name = `daily-${copenhagenTodayISO()}`;
+  const DEAD_STATUSES = new Set(["canceled", "failed"]);
   const list = await fetch(`${RESEND_API}/broadcasts`, { headers: headers() }).then((r) => r.json());
-  if ((list.data ?? []).some((b: { name?: string }) => b.name === name)) {
+  const sameName = (list.data ?? []).filter(
+    (b: { name?: string }) => b.name === name
+  );
+  if (sameName.some((b: { status?: string }) => !DEAD_STATUSES.has(b.status ?? ""))) {
     return NextResponse.json({ ok: true, sent: false, reason: "already sent today" });
   }
 
