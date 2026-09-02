@@ -8,19 +8,26 @@ import { isConfigured, sendNewsletterAlert } from "@/lib/newsletter";
  * per day ("daily-YYYY-MM-DD") makes the send idempotent - if the name
  * already exists, we skip.
  *
- * The two early Vercel crons also email Tim when the day cannot be sent.
- * The local task has its own alert, but that alert dies with the laptop
- * lid: on 2026-09-02 the task was stamped as run at 06:46 and never
- * executed a step, so nobody heard that the pipeline was late. Vercel names
- * the invoking cron in the x-vercel-cron-schedule header; the strings below
- * must match vercel.json. Hobby crons fire anywhere within the hour, and
- * the 04:15 UTC one lands at 05:15 Copenhagen under CET, before the news
- * pipeline has finished, so alerts are held back until 06:00 local time.
+ * This endpoint is also the only place that alerts Tim. Alerting used to
+ * live in the local task, the 13:25 watchdog task and a GitHub Actions
+ * workflow; all three were retired on 2026-09-02 because the first two die
+ * with the laptop lid (the task was stamped as run at 06:46 that morning
+ * and never executed a step) and the GitHub schedule ran 5-8 hours late
+ * every day. Now the two early Vercel crons and the final 13:00 one email
+ * Tim when their run leaves the day unsent. Vercel names the invoking cron
+ * in the x-vercel-cron-schedule header; the strings below must match
+ * vercel.json. Hobby crons fire anywhere within the hour, and the 04:15
+ * UTC one lands at 05:15 Copenhagen under CET, before the news pipeline
+ * has finished, so alerts are held back until 06:00 local time.
  */
 
 const RESEND_API = "https://api.resend.com";
-const EARLY_CRON_SCHEDULES = new Set(["15 4 * * *", "15 5 * * *"]);
+const FINAL_CRON_SCHEDULE = "0 11 * * *"; // 13:00 CEST / 12:00 CET
+const ALERTING_CRON_SCHEDULES = new Set(["15 4 * * *", "15 5 * * *", FINAL_CRON_SCHEDULE]);
 const ALERT_FROM_LOCAL_TIME = "06:00";
+// A broadcast normally goes from queued to sent within a minute; one that
+// is still not sent after this long is stuck and needs a human.
+const STUCK_AFTER_MS = 10 * 60 * 1000;
 
 function headers() {
   return {
@@ -148,11 +155,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: false, reason: "not configured" }, { status: 503 });
   }
 
-  // Early-cron runs email Tim on any outcome that leaves the day unsent.
+  // Alerting-cron runs email Tim on any outcome that leaves the day unsent.
   const now = copenhagenNowHHMM();
+  const schedule = req.headers.get("x-vercel-cron-schedule") ?? "";
   const alertOnFailure =
-    EARLY_CRON_SCHEDULES.has(req.headers.get("x-vercel-cron-schedule") ?? "") &&
-    now >= ALERT_FROM_LOCAL_TIME;
+    ALERTING_CRON_SCHEDULES.has(schedule) && now >= ALERT_FROM_LOCAL_TIME;
   async function alert(subject: string, text: string): Promise<boolean> {
     if (!alertOnFailure) return false;
     const res = await sendNewsletterAlert(subject, text);
@@ -160,9 +167,14 @@ export async function GET(req: NextRequest) {
     return res.ok;
   }
   const nextAttempts =
-    "Nyhedsbrevet sendes automatisk ved næste kald, så snart dagens side findes. " +
-    "Næste automatiske forsøg: Vercel-cron inden for cirka en time, derefter 08:30 og 13:00 " +
-    "(dansk sommertid, en time tidligere om vinteren). Vagthunden tjekker 13:25.";
+    schedule === FINAL_CRON_SCHEDULE
+      ? "Det var dagens sidste automatiske forsøg. Når dagens side findes, skal endpointet " +
+        "kaldes manuelt: skriv \"kør\" til newsletter-send-tasken i Claude Code, eller kald " +
+        "/api/newsletter-send med CRON_SECRET."
+      : "Nyhedsbrevet sendes automatisk ved næste kald, så snart dagens side findes. " +
+        "Næste automatiske forsøg: Vercel-cron inden for cirka en time, derefter 08:30 og 13:00 " +
+        "(dansk sommertid, en time tidligere om vinteren). 13:00-forsøget alarmerer igen, " +
+        "hvis dagen stadig ikke er sendt.";
 
   // 1. Today's stories (same source as the site, but read uncached).
   // The site tolerates a 10-minute-old view of Notion; this endpoint must
@@ -235,8 +247,25 @@ export async function GET(req: NextRequest) {
   const sameName = (list.data ?? []).filter(
     (b: { name?: string }) => b.name === name
   );
-  if (sameName.some((b: { status?: string }) => !DEAD_STATUSES.has(b.status ?? ""))) {
-    return NextResponse.json({ ok: true, sent: false, reason: "already sent today" });
+  const blocking = sameName.find(
+    (b: { status?: string; created_at?: string }) => !DEAD_STATUSES.has(b.status ?? "")
+  );
+  if (blocking) {
+    // Exists but never reached "sent": Resend accepted it and then stalled.
+    // Nothing here can fix that, so tell Tim rather than wait for a caller
+    // that will never come (this replaced the 13:25 watchdog task).
+    const age = Date.now() - Date.parse(blocking.created_at ?? "");
+    const stuck = blocking.status !== "sent" && age > STUCK_AFTER_MS;
+    const alerted = stuck
+      ? await alert(
+          `Nyhedsbrev hænger kl. ${now}: broadcast status ${blocking.status}`,
+          `Broadcastet ${name} blev oprettet ${blocking.created_at}, men står stadig som ` +
+            `"${blocking.status}" i stedet for "sent". Tjek Resend-dashboardet. ` +
+            "Et annulleret eller fejlet broadcast kan hverken sendes igen eller slettes via API'et; " +
+            "endpointet ignorerer det og opretter et nyt ved næste kald."
+        )
+      : false;
+    return NextResponse.json({ ok: true, sent: false, reason: "already sent today", alerted });
   }
 
   // 3. Create + send the broadcast.
