@@ -116,3 +116,29 @@ export async function sendConfirmEmail(email: string, baseUrl: string) {
     html,
   });
 }
+
+/* ------------------------------------------------------------------ */
+/* Failure alerts to Tim                                               */
+/* ------------------------------------------------------------------ */
+
+const ALERT_TO = "tim@frankandersen.com";
+
+/**
+ * Plain-text alert to Tim's inbox. Sent as a normal email, not a broadcast,
+ * so it reaches him even though his address is unsubscribed from the
+ * audience. The sender must stay identical to the daily subscriber report:
+ * Outlook's Focused inbox sorts on sender familiarity, and an unfamiliar
+ * display name sent the 10 August 2026 alerts to "Other" (same rule as
+ * ~/.claude/scripts/newsletter-alert.sh).
+ */
+export async function sendNewsletterAlert(subject: string, text: string) {
+  return resend("/emails", "POST", {
+    from:
+      process.env.NEWSLETTER_FROM ??
+      "Tim Frank Andersen <news@timfrankandersen.com>",
+    reply_to: ALERT_TO,
+    to: ALERT_TO,
+    subject,
+    text,
+  });
+}

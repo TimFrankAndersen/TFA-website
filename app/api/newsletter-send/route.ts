@@ -1,16 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getNewsDays } from "@/lib/content";
-import { isConfigured } from "@/lib/newsletter";
+import { isConfigured, sendNewsletterAlert } from "@/lib/newsletter";
 
 /**
- * Daily newsletter sender, triggered by Vercel Cron (see vercel.json):
- * once at 06:00 UTC and a catch-up at 08:30 UTC for days where the
- * morning pipeline needed its retry. A named broadcast per day
- * ("daily-YYYY-MM-DD") makes the send idempotent - if the name already
- * exists, we skip.
+ * Daily newsletter sender. Callers: the local 06:30 Claude task, the GitHub
+ * Actions workflow and the Vercel crons in vercel.json. A named broadcast
+ * per day ("daily-YYYY-MM-DD") makes the send idempotent - if the name
+ * already exists, we skip.
+ *
+ * The two early Vercel crons also email Tim when the day cannot be sent.
+ * The local task has its own alert, but that alert dies with the laptop
+ * lid: on 2026-09-02 the task was stamped as run at 06:46 and never
+ * executed a step, so nobody heard that the pipeline was late. Vercel names
+ * the invoking cron in the x-vercel-cron-schedule header; the strings below
+ * must match vercel.json. Hobby crons fire anywhere within the hour, and
+ * the 04:15 UTC one lands at 05:15 Copenhagen under CET, before the news
+ * pipeline has finished, so alerts are held back until 06:00 local time.
  */
 
 const RESEND_API = "https://api.resend.com";
+const EARLY_CRON_SCHEDULES = new Set(["15 4 * * *", "15 5 * * *"]);
+const ALERT_FROM_LOCAL_TIME = "06:00";
 
 function headers() {
   return {
@@ -22,6 +32,16 @@ function headers() {
 function copenhagenTodayISO(): string {
   return new Intl.DateTimeFormat("en-CA", {
     timeZone: "Europe/Copenhagen",
+  }).format(new Date());
+}
+
+/** "HH:MM" in Copenhagen; sorts as a string, which is all we need. */
+function copenhagenNowHHMM(): string {
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/Copenhagen",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
   }).format(new Date());
 }
 
@@ -128,6 +148,22 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: false, reason: "not configured" }, { status: 503 });
   }
 
+  // Early-cron runs email Tim on any outcome that leaves the day unsent.
+  const now = copenhagenNowHHMM();
+  const alertOnFailure =
+    EARLY_CRON_SCHEDULES.has(req.headers.get("x-vercel-cron-schedule") ?? "") &&
+    now >= ALERT_FROM_LOCAL_TIME;
+  async function alert(subject: string, text: string): Promise<boolean> {
+    if (!alertOnFailure) return false;
+    const res = await sendNewsletterAlert(subject, text);
+    if (!res.ok) console.error("[newsletter] alert failed:", res.json);
+    return res.ok;
+  }
+  const nextAttempts =
+    "Nyhedsbrevet sendes automatisk ved næste kald, så snart dagens side findes. " +
+    "Næste automatiske forsøg: Vercel-cron inden for cirka en time, derefter 08:30 og 13:00 " +
+    "(dansk sommertid, en time tidligere om vinteren). Vagthunden tjekker 13:25.";
+
   // 1. Today's stories (same source as the site, but read uncached).
   // The site tolerates a 10-minute-old view of Notion; this endpoint must
   // not. When the morning pipeline fails and the retry publishes late, a
@@ -151,7 +187,19 @@ export async function GET(req: NextRequest) {
   }
 
   if (!today?.isToday || today.stories.length === 0) {
-    return NextResponse.json({ ok: true, sent: false, reason: "no stories for today yet" });
+    const alerted = await alert(
+      `Nyhedsbrev ikke sendt kl. ${now}: ingen historier i Notion endnu`,
+      "Der er ingen historier for i dag i Notion-databasen AI News English Posts, " +
+        "så morgenens nyhedspipeline har ikke oprettet dagens side endnu. " +
+        "Kør ai-linkedin-news, eller vent og se om pipelinen stadig arbejder. " +
+        nextAttempts
+    );
+    return NextResponse.json({
+      ok: true,
+      sent: false,
+      reason: "no stories for today yet",
+      alerted,
+    });
   }
 
   // Test mode (?test=1): one-off email to the owner, bypassing the
@@ -207,7 +255,13 @@ export async function GET(req: NextRequest) {
   const created = await create.json();
   if (!create.ok || !created.id) {
     console.error("[newsletter] broadcast create failed:", created);
-    return NextResponse.json({ ok: false }, { status: 502 });
+    const alerted = await alert(
+      `Nyhedsbrev ikke sendt kl. ${now}: Resend afviste broadcastet`,
+      `Resend afviste oprettelsen af dagens broadcast (HTTP ${create.status}). ` +
+        "Tjek Resend-dashboardet. " +
+        nextAttempts
+    );
+    return NextResponse.json({ ok: false, alerted }, { status: 502 });
   }
 
   const send = await fetch(`${RESEND_API}/broadcasts/${created.id}/send`, {
@@ -217,7 +271,13 @@ export async function GET(req: NextRequest) {
   });
   if (!send.ok) {
     console.error("[newsletter] broadcast send failed:", await send.text());
-    return NextResponse.json({ ok: false }, { status: 502 });
+    const alerted = await alert(
+      `Nyhedsbrev ikke sendt kl. ${now}: Resend kunne ikke sende broadcastet`,
+      `Broadcastet ${name} blev oprettet, men Resend afviste afsendelsen (HTTP ${send.status}). ` +
+        "Det står nu som draft i Resend-dashboardet og blokerer ikke et nyt forsøg. " +
+        nextAttempts
+    );
+    return NextResponse.json({ ok: false, alerted }, { status: 502 });
   }
 
   return NextResponse.json({ ok: true, sent: true, broadcast: created.id, name });
