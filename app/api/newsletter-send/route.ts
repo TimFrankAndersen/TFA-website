@@ -181,13 +181,21 @@ export async function GET(req: NextRequest) {
   // not. When the morning pipeline fails and the retry publishes late, a
   // cached read still says "no stories for today yet" and the day is skipped
   // with no error anywhere. That cost a send on 2026-08-10.
-  const days = await getNewsDays({ fresh: true });
+  // Also read without the bundled sample-day fallback: when Notion is
+  // unreachable, or every page parses to zero stories, the site shows the
+  // samples stamped with today's date, and this route would broadcast them
+  // to every subscriber as today's news. Without the fallback such a day
+  // simply reads as unsent below, and the alerting crons tell Tim.
+  const days = await getNewsDays({ fresh: true, fallback: false });
   const today = days[0];
 
   // Preview mode (?preview=1): render the email as an HTML page for visual
   // review, using the latest available day so it always shows an example.
   if (params.get("preview") === "1") {
     const day = today ?? days[0];
+    if (!day) {
+      return new NextResponse("No news days in Notion to preview", { status: 404 });
+    }
     const html = renderEmail(
       day.date,
       day.stories,
@@ -201,8 +209,9 @@ export async function GET(req: NextRequest) {
   if (!today?.isToday || today.stories.length === 0) {
     const alerted = await alert(
       `Nyhedsbrev ikke sendt kl. ${now}: ingen historier i Notion endnu`,
-      "Der er ingen historier for i dag i Notion-databasen AI News English Posts, " +
-        "så morgenens nyhedspipeline har ikke oprettet dagens side endnu. " +
+      "Der er ingen historier for i dag i Notion-databasen AI News English Posts " +
+        "(eller Notion kunne ikke læses), så morgenens nyhedspipeline har " +
+        "ikke oprettet dagens side endnu. " +
         "Kør ai-linkedin-news, eller vent og se om pipelinen stadig arbejder. " +
         nextAttempts
     );

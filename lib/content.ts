@@ -211,12 +211,15 @@ function parseStories(blocks: NotionBlock[]): Story[] {
  * Daily 5 curated AI stories, newest day first, read from the
  * "AI News English Posts" Notion database that the AI Curriculum pipeline
  * fills every morning. Falls back to bundled sample data (stamped with
- * real dates) when Notion is not configured or unreachable.
+ * real dates) when Notion is not configured or unreachable - that keeps the
+ * site rendering, but the newsletter sender must never broadcast samples as
+ * today's news, so it passes `fallback: false` and gets `[]` instead.
  */
 export async function getNewsDays(
-  opts: { fresh?: boolean } = {}
+  opts: { fresh?: boolean; fallback?: boolean } = {}
 ): Promise<NewsDay[]> {
   const fresh = opts.fresh ?? false;
+  const fallback = opts.fallback ?? true;
   const dbId = process.env.NOTION_NEWS_DB_ID;
   if (process.env.NOTION_API_KEY && dbId) {
     try {
@@ -245,6 +248,8 @@ export async function getNewsDays(
       console.error("[content] Notion news fetch failed:", err);
     }
   }
+
+  if (!fallback) return [];
 
   // Fallback: bundled sample days, stamped with real dates.
   const sample = fallbackNews as { stories: Story[] }[];
