@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import type { NewsDay } from "@/lib/content";
 
 /**
- * Date-stepped daily feed. Convention (Tim's call): the RIGHT arrow goes
- * BACK in time (older), the LEFT arrow goes forward toward today.
+ * Date-stepped daily feed. Convention (Tim's call): the LEFT arrow goes
+ * BACK in time (older), the RIGHT arrow goes forward toward today.
  *
  * Two visual variants:
  *  - "stories" (default): the /news page's article list with tag + date
@@ -61,9 +61,9 @@ export default function NewsFeed({
         <button
           className="news-arrow"
           type="button"
-          aria-label="Newer day"
-          disabled={idx === 0}
-          onClick={() => setIdx((i) => Math.max(0, i - 1))}
+          aria-label="Earlier day"
+          disabled={idx === days.length - 1}
+          onClick={() => setIdx((i) => Math.min(days.length - 1, i + 1))}
         >
           &lsaquo;
         </button>
@@ -73,9 +73,9 @@ export default function NewsFeed({
         <button
           className="news-arrow"
           type="button"
-          aria-label="Earlier day"
-          disabled={idx === days.length - 1}
-          onClick={() => setIdx((i) => Math.min(days.length - 1, i + 1))}
+          aria-label="Newer day"
+          disabled={idx === 0}
+          onClick={() => setIdx((i) => Math.max(0, i - 1))}
         >
           &rsaquo;
         </button>
