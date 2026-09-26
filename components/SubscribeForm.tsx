@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 type State = "idle" | "sending" | "sent" | "error";
@@ -8,7 +9,8 @@ type State = "idle" | "sending" | "sent" | "error";
  * Newsletter signup (double opt-in): posts to /api/subscribe, which adds
  * the address as a pending contact and sends a confirmation email.
  */
-export default function SubscribeForm() {
+export default function SubscribeForm({ variant }: { variant?: "hero" }) {
+  const hero = variant === "hero";
   const [state, setState] = useState<State>("idle");
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -38,10 +40,14 @@ export default function SubscribeForm() {
   }
 
   return (
-    <form className="sub-form" onSubmit={onSubmit}>
-      <h3 className="display-s" style={{ marginBottom: 18 }}>
-        Want to stay updated on AI in your inbox?
-      </h3>
+    <form className={hero ? "sub-form sub-hero" : "sub-form"} onSubmit={onSubmit}>
+      {hero ? (
+        <p className="note sub-hero-head">Today&rsquo;s AI news, every morning</p>
+      ) : (
+        <h3 className="display-s" style={{ marginBottom: 18 }}>
+          Want to stay updated on AI in your inbox?
+        </h3>
+      )}
       {state === "sent" ? (
         <p className="sub-done" role="status">
           Almost there - check your inbox and click the confirmation link.
@@ -71,7 +77,14 @@ export default function SubscribeForm() {
             </button>
           </div>
           <p className="note sub-note">
-            Free, every morning. No spam, unsubscribe anytime.
+            {hero ? (
+              <>
+                Free. No spam. Easy to unsubscribe.{" "}
+                <Link href="/news">Read today&rsquo;s news &rarr;</Link>
+              </>
+            ) : (
+              "Free, every morning. No spam, unsubscribe anytime."
+            )}
             {state === "error" && (
               <span className="sub-err"> Something failed - try again.</span>
             )}

@@ -533,6 +533,12 @@ blockquote cite{font-family:var(--mono);font-style:normal;font-size:.6875rem;let
 .sub-err{color:#c2543c}
 .sub-done{font-family:var(--mono);font-size:.8rem;letter-spacing:.06em;color:var(--green)}
 .band.dark .sub-done{color:var(--cream)}
+/* hero: newsletter signup (booking lives in the sticky header) */
+.sub-hero-head{margin:0 0 12px;color:var(--cream);text-transform:uppercase}
+.sub-form.sub-hero{margin:0;padding:0;border:0;width:100%;max-width:520px}
+.sub-hero .sub-row input[type="email"]{background:rgba(20,20,20,.35);border-color:rgba(251,247,239,.5);color:var(--cream);padding:16px}
+.sub-hero .sub-row input[type="email"]::placeholder{color:rgba(251,247,239,.6)}
+.sub-hero .sub-note a{color:var(--cream);text-underline-offset:3px;text-decoration-color:var(--green)}
 @media (max-width:560px){
   .sub-row{flex-direction:column}
   .sub-row .btn{width:100%;text-align:center}

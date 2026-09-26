@@ -42,12 +42,7 @@ export default async function Home() {
               for them.
             </p>
             <div className="hero-actions">
-              <Link className="btn" href="/speaking#book">
-                Book Tim
-              </Link>
-              <Link className="arrow" href="/news">
-                See today&rsquo;s AI news <span className="ar">&rarr;</span>
-              </Link>
+              <SubscribeForm variant="hero" />
             </div>
           </div>
         </div>
