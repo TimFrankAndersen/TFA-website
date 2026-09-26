@@ -33,7 +33,7 @@ const JSON_LD = {
       "@id": "https://www.timfrankandersen.com/#person",
       name: "Tim Frank Andersen",
       url: "https://www.timfrankandersen.com",
-      image: "https://www.timfrankandersen.com/images/portrait-2026-bw.jpg",
+      image: "https://www.timfrankandersen.com/images/about-portrait-bw.jpg",
       jobTitle: "Keynote speaker and moderator on AI and technology",
       description:
         "Keynote speaker and moderator on AI and technology. 30 years in tech - from founding one of Denmark's first digital agencies to co-founding Institute of AI.",

@@ -59,7 +59,7 @@ export default async function Home() {
               <figure className="about-portrait" style={{ marginTop: 0 }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/images/portrait-2026-bw.jpg"
+                  src="/images/about-portrait-bw.jpg"
                   alt="Tim Frank Andersen"
                 />
               </figure>
