@@ -87,6 +87,7 @@ export default function SubscribeForm({ variant }: { variant?: "hero" }) {
             {hero ? (
               <>
                 Free. No spam. Easy to unsubscribe.{" "}
+                <br className="br-mobile" />
                 <Link href="/news">Read today&rsquo;s news &rarr;</Link>
               </>
             ) : (

@@ -149,10 +149,11 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 /* keep tight phrases together so they never break mid-phrase */
 .keep{white-space:nowrap}
 
-/* desktop-only line break (hero lede) */
+/* desktop-only / mobile-only line breaks */
 .br-desktop{display:none}
 @media (min-width:761px){
   .br-desktop{display:inline}
+  .br-mobile{display:none}
   .hero-b-inner .lede{max-width:68ch}
 }
 
