@@ -538,7 +538,7 @@ blockquote cite{font-family:var(--mono);font-style:normal;font-size:.6875rem;let
 .sub-form.sub-hero{margin:0;padding:0;border:0;width:100%;max-width:520px}
 .sub-hero .sub-row input[type="email"]{background:rgba(20,20,20,.35);border-color:rgba(251,247,239,.5);color:var(--cream);padding:16px}
 .sub-hero .sub-row input[type="email"]::placeholder{color:rgba(251,247,239,.6)}
-.sub-hero .sub-done{color:var(--cream)}
+.sub-hero .sub-done{margin:0;max-width:520px;padding:16px 18px;background:var(--green);color:var(--cream);font-size:.8125rem;line-height:1.5}
 .sub-hero .sub-note a{color:var(--cream);text-underline-offset:3px;text-decoration-color:var(--green)}
 @media (max-width:560px){
   .sub-row{flex-direction:column}

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type State = "idle" | "sending" | "sent" | "error";
 
@@ -12,6 +12,13 @@ type State = "idle" | "sending" | "sent" | "error";
 export default function SubscribeForm({ variant }: { variant?: "hero" }) {
   const hero = variant === "hero";
   const [state, setState] = useState<State>("idle");
+
+  // The confirmation is temporary - bring the form back after a while.
+  useEffect(() => {
+    if (state !== "sent") return;
+    const t = setTimeout(() => setState("idle"), 8000);
+    return () => clearTimeout(t);
+  }, [state]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
