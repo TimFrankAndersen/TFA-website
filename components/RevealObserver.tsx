@@ -61,8 +61,22 @@ export default function RevealObserver() {
               rowIo?.unobserve(el);
             });
           },
-          { rootMargin: "0px 0px -10% 0px" }
+          // start once a good part of the row is well inside the screen, where
+          // the reader is looking - not the moment it peeks in at the bottom
+          { rootMargin: "0px 0px -20% 0px", threshold: 0.4 }
         );
+
+    // rows that can never reach that zone (the very end of a page) draw
+    // when the reader hits the bottom
+    const onScroll = () => {
+      if (window.innerHeight + window.scrollY < document.documentElement.scrollHeight - 4) return;
+      document
+        .querySelectorAll<HTMLElement>(`:is(${ROWS}):not(.drawn)`)
+        .forEach((el) => {
+          if (el.getBoundingClientRect().top < window.innerHeight) el.classList.add("drawn");
+        });
+    };
+    if (rowIo) window.addEventListener("scroll", onScroll, { passive: true });
 
     const observeAll = () => {
       document
@@ -101,6 +115,7 @@ export default function RevealObserver() {
       mo.disconnect();
       io?.disconnect();
       rowIo?.disconnect();
+      window.removeEventListener("scroll", onScroll);
       cancels.forEach((c) => c());
     };
   }, [pathname]);

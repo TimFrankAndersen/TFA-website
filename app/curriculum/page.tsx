@@ -119,9 +119,12 @@ export default function CurriculumPage() {
             </p>
           </div>
 
-          <hr className="rule" style={{ margin: "clamp(48px,7vw,88px) 0" }} />
-
-          <ol className="pred-list" data-reveal>
+          {/* no <hr> here: the list's first row draws its own top rule */}
+          <ol
+            className="pred-list"
+            style={{ marginTop: "clamp(48px,7vw,88px)" }}
+            data-reveal
+          >
             {FEATURES.map((f, i) => (
               <li key={f.title}>
                 <span className="num">{String(i + 1).padStart(2, "0")}</span>
