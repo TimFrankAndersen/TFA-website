@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import DotField from "@/components/DotField";
+import ScrollLit from "@/components/ScrollLit";
 
 export const metadata: Metadata = {
   title: "About",
@@ -141,10 +143,11 @@ export default function AboutPage() {
               </p>
             </div>
             <div>
-              <h2 className="display-m" style={{ marginBottom: 24 }}>
-                AI isn&rsquo;t the future - it&rsquo;s your company&rsquo;s
-                next step
-              </h2>
+              <ScrollLit
+                className="display-m"
+                style={{ marginBottom: 24 }}
+                parts={["AI isn\u2019t the future - it\u2019s your company\u2019s next step"]}
+              />
               <p className="body-max" style={{ color: "var(--dim)" }}>
                 Institute of AI is an AI strategy consultancy founded with one
                 mission: to help organisations understand, adopt and lead with
@@ -178,9 +181,11 @@ export default function AboutPage() {
               <p className="label">The Advanced AI Network</p>
             </div>
             <div>
-              <h2 className="display-m" style={{ marginBottom: 24 }}>
-                Where Denmark&rsquo;s AI leaders compare notes
-              </h2>
+              <ScrollLit
+                className="display-m"
+                style={{ marginBottom: 24 }}
+                parts={["Where Denmark\u2019s AI leaders compare notes"]}
+              />
               <p className="body-max" style={{ color: "var(--dim)" }}>
                 Institute of AI also runs the Advanced AI Network - an
                 invitation-only community for the people responsible for AI in
@@ -228,10 +233,11 @@ export default function AboutPage() {
       <div className="band light">
         <div className="wrap" data-reveal>
           <p className="label">Investments</p>
-          <h2 className="display-m" style={{ margin: "20px 0 14px" }}>
-            Over the years I have invested in startups
-            <br />- and exited quite a few.
-          </h2>
+          <ScrollLit
+            className="display-m"
+            style={{ margin: "20px 0 14px" }}
+            parts={["Over the years I have invested in startups", { br: true }, "- and exited quite a few."]}
+          />
           <p className="lede" style={{ marginBottom: 34 }}>
             Besides my co-ownership of Institute of AI, this is my current
             portfolio.
@@ -292,9 +298,10 @@ export default function AboutPage() {
 
       {/* CTA (dark) */}
       <div
-        className="band dark thin"
+        className="band dark thin has-dots"
         style={{ paddingBlock: "clamp(48px,6vw,72px)" }}
       >
+        <DotField />
         <div className="wrap cta-band" data-reveal>
           <h2 className="display-m">Book Tim to speak</h2>
           <Link className="btn" href="/speaking#book">

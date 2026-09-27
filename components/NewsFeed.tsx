@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { NewsDay } from "@/lib/content";
+import Decode from "@/components/Decode";
 
 /**
  * Date-stepped daily feed. Convention (Tim's call): the LEFT arrow goes
@@ -19,7 +20,10 @@ export default function NewsFeed({
   variant?: "stories" | "numbered";
 }) {
   const [idx, setIdx] = useState(0);
+  // which way the reader last stepped - the stories slide in from that side
+  const [dir, setDir] = useState<"older" | "newer" | null>(null);
   const day = days[idx];
+  const date = day.isToday ? `Today · ${day.date}` : day.date;
 
   // Motion candidate 6: the big numerals tick up 00 -> 01..05 the first
   // time the numbered list scrolls into view. Runs once; skipped when the
@@ -63,29 +67,36 @@ export default function NewsFeed({
           type="button"
           aria-label="Earlier day"
           disabled={idx === days.length - 1}
-          onClick={() => setIdx((i) => Math.min(days.length - 1, i + 1))}
+          onClick={() => {
+            setDir("older");
+            setIdx((i) => Math.min(days.length - 1, i + 1));
+          }}
         >
           &lsaquo;
         </button>
         <span className="news-date" aria-live="polite">
-          {day.isToday ? `Today · ${day.date}` : day.date}
+          <Decode key={date} text={date} animate={dir !== null} />
         </span>
         <button
           className="news-arrow"
           type="button"
           aria-label="Newer day"
           disabled={idx === 0}
-          onClick={() => setIdx((i) => Math.max(0, i - 1))}
+          onClick={() => {
+            setDir("newer");
+            setIdx((i) => Math.max(0, i - 1));
+          }}
         >
           &rsaquo;
         </button>
       </div>
 
       {variant === "numbered" ? (
-        // key={idx} remounts on day change so the crossfade replays
-        <ol className="newslist day-swap" key={idx} ref={listRef}>
+        // key={idx} remounts on day change so the slide-in replays
+        <ol className={`newslist day-slide ${dir ?? ""}`} key={idx} ref={listRef}>
           {day.stories.map((s, i) => (
-            <li key={s.h}>
+            // rows after a day change arrive already drawn - the slide is the motion
+            <li key={s.h} className={dir ? "drawn" : undefined} style={{ ["--i" as string]: i }}>
               <span className="num">{String(i + 1).padStart(2, "0")}</span>
               <div>
                 <h3 className="display-s">{s.h}</h3>
@@ -95,9 +106,9 @@ export default function NewsFeed({
           ))}
         </ol>
       ) : (
-        <div className="day-swap" key={idx}>
-          {day.stories.map((s) => (
-            <article className="story" key={s.h}>
+        <div className={`day-slide ${dir ?? ""}`} key={idx}>
+          {day.stories.map((s, i) => (
+            <article className={`story${dir ? " drawn" : ""}`} key={s.h} style={{ ["--i" as string]: i }}>
               <div className="feedmeta">
                 <span className="tag">AI News</span>
                 <span className="date">{day.date}</span>

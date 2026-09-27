@@ -1,6 +1,10 @@
 import Link from "next/link";
 import NewsFeed from "@/components/NewsFeed";
 import SubscribeForm from "@/components/SubscribeForm";
+import HeroParallax from "@/components/HeroParallax";
+import Ticker from "@/components/Ticker";
+import ScrollLit from "@/components/ScrollLit";
+import DotField from "@/components/DotField";
 import { getNewsDays, getLinkedInPosts } from "@/lib/content";
 
 // Refresh the news + LinkedIn sections from Notion at most hourly.
@@ -20,10 +24,11 @@ export default async function Home() {
           alt="Tim Frank Andersen on stage in front of a large conference audience"
         />
         <div className="hero-b-scrim" aria-hidden="true" />
+        <HeroParallax />
         <div className="hero-b-inner">
           <div className="wrap">
             <span className="tick" aria-hidden="true" />
-            <p className="label">
+            <p className="label" data-decode>
               Keynote speaker &amp; moderator on AI and technology
             </p>
             <h1 className="display-xl">
@@ -37,9 +42,9 @@ export default async function Home() {
             <p className="lede">
               I&rsquo;ve worked in tech for 30 years. Right now the big shift
               is AI{" "}
-              <br className="br-desktop" />- I help organisations understand
-              what&rsquo;s real, what&rsquo;s next, and what&rsquo;s in it
-              for them.
+              <br className="br-desktop" />- I help organisations understand{" "}
+              <mark className="mk">what&rsquo;s real, what&rsquo;s next</mark>,
+              and <mark className="mk">what&rsquo;s in it for them.</mark>
             </p>
             <div className="hero-actions">
               <SubscribeForm variant="hero" />
@@ -47,6 +52,9 @@ export default async function Home() {
           </div>
         </div>
       </div>
+
+      {/* TODAY'S HEADLINES TICKER (dark) */}
+      <Ticker headlines={days[0]?.stories.map((s) => s.h) ?? []} />
 
       {/* ABOUT TEASER (light) */}
       <div className="band light">
@@ -65,14 +73,20 @@ export default async function Home() {
               </figure>
             </div>
             <div>
-              <h2 className="display-m" style={{ marginBottom: 26 }}>
-                Thirty years in tech - from founding one of Denmark&rsquo;s
-                first <span className="keep">digital agencies</span> to
-                co-founding <span className="keep">Institute of AI.</span>{" "}
-                Author, <span className="keep">tech expert</span>{" "}
-                on TV, and advisor to some of the world&rsquo;s{" "}
-                <span className="keep">biggest brands.</span>
-              </h2>
+              <ScrollLit
+                className="display-m"
+                style={{ marginBottom: 26 }}
+                parts={[
+                  "Thirty years in tech - from founding one of Denmark\u2019s first",
+                  { keep: "digital agencies" },
+                  "to co-founding",
+                  { keep: "Institute of AI." },
+                  "Author,",
+                  { keep: "tech expert" },
+                  "on TV, and advisor to some of the world\u2019s",
+                  { keep: "biggest brands." },
+                ]}
+              />
               <Link className="arrow" href="/about">
                 More about Tim <span className="ar">&rarr;</span>
               </Link>
@@ -213,9 +227,10 @@ export default async function Home() {
 
       {/* BOOKING CTA (dark) */}
       <div
-        className="band dark thin"
+        className="band dark thin has-dots"
         style={{ paddingBlock: "clamp(48px,6vw,72px)" }}
       >
+        <DotField />
         <div className="wrap cta-band" data-reveal>
           <h2 className="display-m">Book Tim to speak</h2>
           <Link className="btn" href="/speaking#book">

@@ -3,6 +3,7 @@ import Link from "next/link";
 import NewsFeed from "@/components/NewsFeed";
 import SubscribeForm from "@/components/SubscribeForm";
 import { getNewsDays, getLinkedInPosts } from "@/lib/content";
+import DotField from "@/components/DotField";
 
 export const metadata: Metadata = {
   title: "AI News",
@@ -88,9 +89,10 @@ export default async function NewsPage() {
 
       {/* CTA (dark) */}
       <div
-        className="band dark thin"
+        className="band dark thin has-dots"
         style={{ paddingBlock: "clamp(48px,6vw,72px)" }}
       >
+        <DotField />
         <div className="wrap cta-band" data-reveal>
           <h2 className="display-m">Book Tim to speak</h2>
           <Link className="btn" href="/speaking#book">

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import BookingForm from "@/components/BookingForm";
+import ScrollLit from "@/components/ScrollLit";
 
 export const metadata: Metadata = {
   title: "Speaking",
@@ -19,8 +20,8 @@ export default function SpeakingPage() {
               Speaking
             </h1>
             <p className="lede">
-              Two formats, one goal: an audience that leaves sharper than it
-              arrived.
+              Two formats, one goal: an audience that leaves{" "}
+              <mark className="mk">sharper than it arrived.</mark>
             </p>
           </div>
 
@@ -41,10 +42,11 @@ export default function SpeakingPage() {
               </div>
             </div>
             <div>
-              <h2 className="display-m" style={{ marginBottom: 26 }}>
-                The AI Explosion - What&rsquo;s Real, What&rsquo;s Next, and
-                What&rsquo;s in It for You
-              </h2>
+              <ScrollLit
+                className="display-m"
+                style={{ marginBottom: 26 }}
+                parts={["The AI Explosion - What\u2019s Real, What\u2019s Next, and What\u2019s in It for You"]}
+              />
               <p className="body-max">
                 AI isn&rsquo;t a future promise anymore. It&rsquo;s here,
                 it&rsquo;s accelerating, and it&rsquo;s already changing how we
@@ -83,9 +85,11 @@ export default function SpeakingPage() {
               </div>
             </div>
             <div>
-              <h2 className="display-m" style={{ marginBottom: 26 }}>
-                The person tying it all together
-              </h2>
+              <ScrollLit
+                className="display-m"
+                style={{ marginBottom: 26 }}
+                parts={["The person tying it all together"]}
+              />
               <p className="body-max" style={{ color: "var(--dim)" }}>
                 A conference lives or dies on the person tying it together. As
                 moderator I keep the thread running across the day - asking the
