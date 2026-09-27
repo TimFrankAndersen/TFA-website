@@ -87,7 +87,82 @@ async function newsletter() {
     const newest = [...active]
       .sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at))
       .slice(0, 8);
-    return { total: active.length, pending: contacts.length - active.length, last24h: last24h.length, last14: last14.length, newest, broadcasts };
+    const flagged = (contacts as Contact[]).filter((c) => c.unsubscribed);
+    return { total: active.length, flagged, last24h: last24h.length, last14: last14.length, newest, broadcasts };
+  } catch {
+    return null;
+  }
+}
+
+// Time as a subscriber: from confirming (or signing up, for backfilled
+// rows where the confirm time is unknown) to unsubscribing, in days.
+const DAYS_SUBSCRIBED = "extract(epoch FROM unsubscribed_at - coalesce(confirmed_at, created_at)) / 86400";
+
+const DURATION_BUCKETS = ["Under 1 uge", "1-2 uger", "2-4 uger", "1-2 mdr", "2+ mdr"];
+
+/** Unsubscribe history from newsletter_contacts (Resend keeps none). */
+async function unsubscribes() {
+  try {
+    const sql = db();
+    const [kpis, median, buckets, weeks, recent, meta] = await Promise.all([
+      sql`SELECT
+        count(*) FILTER (WHERE unsubscribed_at >= now() - interval '7 days') AS d7,
+        count(*) FILTER (WHERE unsubscribed_at >= now() - interval '30 days') AS d30,
+        count(*) FILTER (WHERE unsubscribed_at IS NOT NULL) AS total
+        FROM newsletter_contacts`,
+      sql.query(`SELECT percentile_cont(0.5) WITHIN GROUP (ORDER BY ${DAYS_SUBSCRIBED}) AS days
+        FROM newsletter_contacts WHERE unsubscribed_at IS NOT NULL`),
+      sql.query(`SELECT CASE WHEN d < 7 THEN 0 WHEN d < 14 THEN 1 WHEN d < 30 THEN 2 WHEN d < 60 THEN 3 ELSE 4 END AS b,
+        count(*) AS n
+        FROM (SELECT ${DAYS_SUBSCRIBED} AS d FROM newsletter_contacts WHERE unsubscribed_at IS NOT NULL) x
+        GROUP BY 1`),
+      sql`SELECT to_char(w, 'DD/MM') AS week, count(c.email) AS n
+        FROM generate_series(
+          date_trunc('week', (SELECT min(first_edition_at) FROM newsletter_contacts) AT TIME ZONE 'Europe/Copenhagen'),
+          date_trunc('week', now() AT TIME ZONE 'Europe/Copenhagen'),
+          interval '1 week') AS w
+        LEFT JOIN newsletter_contacts c
+          ON date_trunc('week', c.unsubscribed_at AT TIME ZONE 'Europe/Copenhagen') = w
+        GROUP BY w ORDER BY w`,
+      sql.query(`SELECT email,
+        to_char(created_at AT TIME ZONE 'Europe/Copenhagen', 'DD/MM') AS tilmeldt,
+        to_char(unsubscribed_at AT TIME ZONE 'Europe/Copenhagen', 'DD/MM') AS afmeldt,
+        unsub_approx,
+        round(${DAYS_SUBSCRIBED}) AS dage
+        FROM newsletter_contacts WHERE unsubscribed_at IS NOT NULL
+        ORDER BY unsubscribed_at DESC LIMIT 12`),
+      sql`SELECT min(first_edition_at) AS since,
+        to_char(min(first_edition_at) AT TIME ZONE 'Europe/Copenhagen', 'DD/MM') AS since_label,
+        count(*) FILTER (WHERE NOT confirmed AND created_at < (SELECT min(first_edition_at) FROM newsletter_contacts)) AS unknown
+        FROM newsletter_contacts`,
+      ]);
+    const k = kpis[0] as Row;
+    const m = meta[0] as Row;
+    const byBucket = new Map((buckets as Row[]).map((r) => [Number(r.b), Number(r.n)]));
+    return {
+      d7: Number(k.d7 ?? 0),
+      d30: Number(k.d30 ?? 0),
+      total: Number(k.total ?? 0),
+      medianDays: median[0]?.days == null ? null : Math.round(Number(median[0].days)),
+      buckets: DURATION_BUCKETS.map((label, i) => ({ label, n: byBucket.get(i) ?? 0 })),
+      weeks: weeks as Row[],
+      recent: recent as Row[],
+      since: m.since ? new Date(String(m.since)) : null,
+      sinceLabel: String(m.since_label ?? ""),
+      unknown: Number(m.unknown ?? 0),
+    };
+  } catch (err) {
+    console.error("[dashboard] unsubscribes failed:", err);
+    return null;
+  }
+}
+
+/** Addresses that are unsubscribed in Resend for a known reason other than "not confirmed yet". */
+async function notPendingEmails(since: Date | null) {
+  try {
+    const rows = await db()`SELECT email FROM newsletter_contacts
+      WHERE unsubscribed_at IS NOT NULL OR (NOT confirmed AND created_at < ${since})`;
+    return new Set((rows as Row[]).map((r) => String(r.email)));
   } catch {
     return null;
   }
@@ -191,7 +266,13 @@ export default async function DashboardPage({
     );
   }
 
-  const [a, nl] = await Promise.all([analytics(), newsletter()]);
+  const [a, nl, un] = await Promise.all([analytics(), newsletter(), unsubscribes()]);
+  // Resend marks both never-confirmed signups and real unsubscribes as
+  // "unsubscribed"; only the first are pending.
+  const known = un ? await notPendingEmails(un.since) : null;
+  const pending = nl
+    ? nl.flagged.filter((c) => !known?.has(c.email.trim().toLowerCase())).length
+    : 0;
   const k = a.kpis;
   const fmtSecs = (s: unknown) =>
     s == null ? "-" : `${Math.floor(Number(s) / 60)}m ${Number(s) % 60}s`;
@@ -219,7 +300,11 @@ export default async function DashboardPage({
                 <Kpi label="Aktive abonnenter" value={String(nl.total)} />
                 <Kpi label="Nye - 24 timer" value={String(nl.last24h)} />
                 <Kpi label="Nye - 14 dage" value={String(nl.last14)} />
-                <Kpi label="Ubekræftede" value={String(nl.pending)} sub="tilmeldt, ikke bekræftet" />
+                <Kpi
+                  label="Ubekræftede"
+                  value={String(pending)}
+                  sub={known ? "tilmeldt, ikke bekræftet" : "inkl. afmeldte - historik utilgængelig"}
+                />
                 {(() => {
                   // Resend Pro: 50,000 emails/month. Daily broadcast ~= active
                   // subscribers, so estimated monthly volume = active * 31.
@@ -277,6 +362,66 @@ export default async function DashboardPage({
                   </p>
                 </div>
               </div>
+
+              {/* AFMELDINGER */}
+              <p className="label" style={{ margin: "clamp(36px,5vw,56px) 0 24px" }}>Afmeldinger</p>
+              {!un ? (
+                <p className="note">Kunne ikke hente afmeldinger.</p>
+              ) : (
+                <>
+                  <div className="dash-grid">
+                    <Kpi label="Afmeldinger - 7 dage" value={String(un.d7)} />
+                    <Kpi
+                      label="Afmeldinger - 30 dage"
+                      value={String(un.d30)}
+                      sub={nl.total ? `${((un.d30 / (nl.total + un.d30)) * 100).toFixed(1)}% af abonnenterne` : undefined}
+                    />
+                    <Kpi
+                      label="Median tid som abonnent"
+                      value={un.medianDays == null ? "-" : `${un.medianDays} dage`}
+                      sub={`blandt ${un.total} afmeldte`}
+                    />
+                    <Kpi
+                      label="Gik inden 1 uge"
+                      value={un.total ? `${Math.round((un.buckets[0].n / un.total) * 100)}%` : "-"}
+                      sub={`${un.buckets[0].n} af ${un.total}`}
+                    />
+                  </div>
+                  <div className="dash-two">
+                    <div className="dash-card">
+                      <p className="label" style={{ marginBottom: 16 }}>Tid som abonnent før afmelding</p>
+                      <Bars data={un.buckets} labelKey="label" valueKey="n" showValues />
+                    </div>
+                    <div className="dash-card">
+                      <p className="label" style={{ marginBottom: 16 }}>Afmeldinger pr. uge</p>
+                      <Bars data={un.weeks} labelKey="week" valueKey="n" showValues />
+                    </div>
+                  </div>
+                  <div className="dash-card" style={{ marginTop: 20 }}>
+                    <p className="label" style={{ marginBottom: 12 }}>Seneste afmeldinger</p>
+                    <Table
+                      rows={un.recent.map((r) => ({
+                        email: r.email,
+                        tilmeldt: r.tilmeldt,
+                        afmeldt: r.unsub_approx ? `ca. ${r.afmeldt}` : r.afmeldt,
+                        tid: `${r.dage} dage`,
+                      }))}
+                      cols={[
+                        { key: "email", label: "Email" },
+                        { key: "tilmeldt", label: "Tilmeldt", right: true },
+                        { key: "afmeldt", label: "Afmeldt", right: true },
+                        { key: "tid", label: "Som abonnent", right: true },
+                      ]}
+                    />
+                    <p className="note" style={{ marginTop: 12 }}>
+                      Målt siden {un.sinceLabel}. Resend gemmer ikke, hvornår folk afmelder sig: datoer
+                      markeret &ldquo;ca.&rdquo; er dagen for den sidste udgave, de modtog; nye afmeldinger
+                      registreres præcist. {un.unknown} kontakter fra før {un.sinceLabel} kan ikke
+                      placeres - de er enten afmeldt før da eller har aldrig bekræftet.
+                    </p>
+                  </div>
+                </>
+              )}
             </>
           )}
         </div>
