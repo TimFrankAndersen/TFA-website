@@ -628,7 +628,89 @@ blockquote cite{font-family:var(--mono);font-style:normal;font-size:.6875rem;let
     border-color:var(--green);
   }
 
-  /* 5 - STEPPER CROSSFADE: day change fades the stories up */
-  .day-swap{animation:day-swap .3s ease}
-  @keyframes day-swap{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  /* 5 - DAY SLIDE: stepping back in time slides the stories in from the
+     left, stepping toward today from the right (the date decodes too) */
+  .day-slide.older>*{--from:-36px}
+  .day-slide.newer>*{--from:36px}
+  .day-slide:is(.older,.newer)>*{animation:day-slide .5s cubic-bezier(.2,.7,.2,1) calc(var(--i,0) * 60ms) backwards}
+  @keyframes day-slide{from{opacity:0;transform:translateX(var(--from))}to{opacity:1;transform:none}}
+
+  /* 7 - HAIRLINES DRAW: list rules draw left to right as the list reveals */
+  :is(.newslist>li,.timeline li,.pred-list>li,.mini-list li,.story){position:relative;border-top-color:transparent}
+  :is(.newslist>li,.timeline li,.pred-list>li,.mini-list li,.story)::before,
+  :is(.newslist>li:last-child,.timeline li:last-child,.pred-list>li:last-child,.mini-list li:last-child,.story:last-of-type)::after{
+    content:"";position:absolute;left:0;right:0;height:1px;background:var(--hair);
+    transform-origin:left;
+    transition:transform .8s cubic-bezier(.65,0,.2,1) var(--d,0s);
+  }
+  :is(.newslist>li,.timeline li,.pred-list>li,.mini-list li,.story)::before{top:-1px}
+  :is(.newslist>li:last-child,.timeline li:last-child,.pred-list>li:last-child,.mini-list li:last-child,.story:last-of-type){border-bottom-color:transparent}
+  :is(.newslist>li:last-child,.timeline li:last-child,.pred-list>li:last-child,.mini-list li:last-child,.story:last-of-type)::after{bottom:-1px;transition-delay:calc(var(--d,0s) + .1s)}
+  :is([data-reveal]:not(.in) :is(.newslist>li,.timeline li,.pred-list>li,.mini-list li,.story),:is(.pred-list>li)[data-reveal]:not(.in))::before,
+  :is([data-reveal]:not(.in) :is(.newslist>li,.timeline li,.pred-list>li,.mini-list li,.story),:is(.pred-list>li)[data-reveal]:not(.in))::after{transform:scaleX(0)}
+  :is(.newslist>li,.timeline li,.mini-list li,.story):nth-child(2){--d:.08s}
+  :is(.newslist>li,.timeline li,.mini-list li,.story):nth-child(3){--d:.16s}
+  :is(.newslist>li,.timeline li,.mini-list li,.story):nth-child(4){--d:.24s}
+  :is(.newslist>li,.timeline li,.mini-list li,.story):nth-child(5){--d:.32s}
+  :is(.newslist>li,.timeline li,.mini-list li,.story):nth-child(6){--d:.4s}
+  :is(.newslist>li,.timeline li,.mini-list li,.story):nth-child(7){--d:.48s}
+  :is(.newslist>li,.timeline li,.mini-list li,.story):nth-child(n+8){--d:.56s}
+
+  /* 8 - SCROLL-LIT WORDS: ScrollLit writes --k, each word lights in turn */
+  .lit-w{opacity:calc(.16 + .84 * clamp(0, var(--k,999) - var(--i,0), 1));transition:opacity .15s linear}
+
+  /* 9 - MARKER SWEEP: the green block draws in behind the phrase */
+  [data-reveal] .mk{transition:background-size .7s cubic-bezier(.65,0,.2,1) .45s,color .3s ease .7s}
+  [data-reveal]:not(.in) .mk{background-size:0% 100%;color:inherit}
+  .hero-b-inner .mk{animation:mk-sweep .7s cubic-bezier(.65,0,.2,1) 1.2s backwards}
+  .hero-b-inner .mk~.mk{animation-delay:1.55s}
+  @keyframes mk-sweep{from{background-size:0% 100%}}
+
+  /* 10 - HERO PARALLAX: HeroParallax writes --hy / --hp while scrolling */
+  .hero-b-img{translate:0 var(--hy,0px)}
+  .hero-b-inner{translate:0 calc(var(--hp,0) * -80px);opacity:calc(1 - var(--hp,0) * .8)}
+
+  /* 11 - NEWS TICKER: headlines run right to left, pause on hover/focus */
+  .ticker-move{animation:ticker 80s linear infinite}
+  .ticker:is(:hover,:focus-visible) .ticker-move{animation-play-state:paused}
+  @keyframes ticker{to{transform:translateX(-50%)}}
 }
+
+/* ---- motion layer: structural parts (apply with or without motion) ---- */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* marker: final state is a green block with cream text */
+.mk{
+  color:var(--cream);
+  background:linear-gradient(var(--green),var(--green)) no-repeat 0 0 / 100% 100%;
+  -webkit-box-decoration-break:clone;box-decoration-break:clone;
+  padding:0 .12em;
+}
+
+/* news ticker band */
+.ticker{
+  display:flex;align-items:center;
+  background:var(--ink);color:var(--cream);
+  border-top:1px solid rgba(251,247,239,.24);
+  text-decoration:none;overflow:hidden;
+}
+.ticker-tag{
+  flex:none;position:relative;z-index:1;background:var(--ink);
+  padding:16px 22px 16px max(clamp(20px,5vw,64px),calc((100% - 1240px) / 2 + 64px));
+  border-right:1px solid rgba(251,247,239,.24);
+}
+.ticker-track{flex:1;min-width:0;overflow:hidden;-webkit-mask-image:linear-gradient(to right,transparent,#000 5%,#000 95%,transparent);mask-image:linear-gradient(to right,transparent,#000 5%,#000 95%,transparent)}
+.ticker-move{display:flex;width:max-content}
+.ticker-row{display:flex;list-style:none;margin:0;padding:0}
+.ticker-row li{
+  display:flex;align-items:center;gap:22px;padding:16px 0 16px 22px;white-space:nowrap;
+  font-family:var(--mono);font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;
+}
+.ticker-row li::after{content:"";width:7px;height:7px;background:var(--green);flex:none}
+.ticker:hover .ticker-row li{color:rgba(251,247,239,.82)}
+.ticker:focus-visible{outline-offset:-3px}
+
+/* dot field behind a dark band */
+.has-dots{position:relative;overflow:hidden}
+.has-dots>.wrap{position:relative;z-index:1}
+.dot-field{position:absolute;inset:0;width:100%;height:100%;display:block}

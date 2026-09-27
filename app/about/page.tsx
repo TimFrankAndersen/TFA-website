@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import DotField from "@/components/DotField";
 
 export const metadata: Metadata = {
   title: "About",
@@ -292,9 +293,10 @@ export default function AboutPage() {
 
       {/* CTA (dark) */}
       <div
-        className="band dark thin"
+        className="band dark thin has-dots"
         style={{ paddingBlock: "clamp(48px,6vw,72px)" }}
       >
+        <DotField />
         <div className="wrap cta-band" data-reveal>
           <h2 className="display-m">Book Tim to speak</h2>
           <Link className="btn" href="/speaking#book">

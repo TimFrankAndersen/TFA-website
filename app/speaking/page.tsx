@@ -19,8 +19,8 @@ export default function SpeakingPage() {
               Speaking
             </h1>
             <p className="lede">
-              Two formats, one goal: an audience that leaves sharper than it
-              arrived.
+              Two formats, one goal: an audience that leaves{" "}
+              <mark className="mk">sharper than it arrived.</mark>
             </p>
           </div>
 
