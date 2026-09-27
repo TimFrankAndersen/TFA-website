@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import YearArchive from "@/components/YearArchive";
 import { PREDICTIONS_2026, ARCHIVE } from "@/data/predictions";
+import ScrollLit from "@/components/ScrollLit";
 
 export const metadata: Metadata = {
   title: "Ten AI Predictions for 2026",
@@ -47,7 +48,7 @@ export default function PredictionsPage() {
             data-reveal
             style={{ marginTop: "clamp(48px,7vw,80px)" }}
           >
-            <h2 className="display-l">Disagree with any of these? Good.</h2>
+            <ScrollLit className="display-l" parts={["Disagree with any of these? Good."]} />
             <Link className="btn" href="/speaking#book">
               Book Tim <span className="ar">&rarr;</span>
             </Link>

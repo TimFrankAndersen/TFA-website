@@ -95,7 +95,8 @@ export default function NewsFeed({
         // key={idx} remounts on day change so the slide-in replays
         <ol className={`newslist day-slide ${dir ?? ""}`} key={idx} ref={listRef}>
           {day.stories.map((s, i) => (
-            <li key={s.h} style={{ ["--i" as string]: i }}>
+            // rows after a day change arrive already drawn - the slide is the motion
+            <li key={s.h} className={dir ? "drawn" : undefined} style={{ ["--i" as string]: i }}>
               <span className="num">{String(i + 1).padStart(2, "0")}</span>
               <div>
                 <h3 className="display-s">{s.h}</h3>
@@ -107,7 +108,7 @@ export default function NewsFeed({
       ) : (
         <div className={`day-slide ${dir ?? ""}`} key={idx}>
           {day.stories.map((s, i) => (
-            <article className="story" key={s.h} style={{ ["--i" as string]: i }}>
+            <article className={`story${dir ? " drawn" : ""}`} key={s.h} style={{ ["--i" as string]: i }}>
               <div className="feedmeta">
                 <span className="tag">AI News</span>
                 <span className="date">{day.date}</span>

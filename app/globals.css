@@ -561,22 +561,22 @@ blockquote cite{font-family:var(--mono);font-style:normal;font-size:.6875rem;let
 @media (prefers-reduced-motion: no-preference){
 
   /* 1 - STAGGERED REVEALS: list children cascade in one by one */
-  [data-reveal]:not(.in) :is(.newslist>li,.quotes blockquote,.timeline li,.li-grid .li-card,.pred-list>li,.story,.formats>div){
+  [data-reveal]:not(.in) :is(.quotes blockquote,.li-grid .li-card,.formats>div){
     opacity:0;transform:translateY(14px);
   }
-  [data-reveal] :is(.newslist>li,.quotes blockquote,.timeline li,.li-grid .li-card,.pred-list>li,.story,.formats>div){
+  [data-reveal] :is(.quotes blockquote,.li-grid .li-card,.formats>div){
     transition:opacity .55s ease,transform .55s ease;
   }
-  [data-reveal].in :is(.newslist>li,.quotes blockquote,.timeline li,.li-grid .li-card,.pred-list>li,.story,.formats>div){
+  [data-reveal].in :is(.quotes blockquote,.li-grid .li-card,.formats>div){
     opacity:1;transform:none;
   }
-  [data-reveal].in :is(.newslist>li,.quotes blockquote,.timeline li,.li-grid .li-card,.pred-list>li,.story,.formats>div):nth-child(2){transition-delay:.08s}
-  [data-reveal].in :is(.newslist>li,.quotes blockquote,.timeline li,.li-grid .li-card,.pred-list>li,.story,.formats>div):nth-child(3){transition-delay:.16s}
-  [data-reveal].in :is(.newslist>li,.quotes blockquote,.timeline li,.li-grid .li-card,.pred-list>li,.story,.formats>div):nth-child(4){transition-delay:.24s}
-  [data-reveal].in :is(.newslist>li,.quotes blockquote,.timeline li,.li-grid .li-card,.pred-list>li,.story,.formats>div):nth-child(5){transition-delay:.32s}
-  [data-reveal].in :is(.newslist>li,.quotes blockquote,.timeline li,.li-grid .li-card,.pred-list>li,.story,.formats>div):nth-child(6){transition-delay:.4s}
-  [data-reveal].in :is(.newslist>li,.quotes blockquote,.timeline li,.li-grid .li-card,.pred-list>li,.story,.formats>div):nth-child(7){transition-delay:.48s}
-  [data-reveal].in :is(.newslist>li,.quotes blockquote,.timeline li,.li-grid .li-card,.pred-list>li,.story,.formats>div):nth-child(n+8){transition-delay:.56s}
+  [data-reveal].in :is(.quotes blockquote,.li-grid .li-card,.formats>div):nth-child(2){transition-delay:.08s}
+  [data-reveal].in :is(.quotes blockquote,.li-grid .li-card,.formats>div):nth-child(3){transition-delay:.16s}
+  [data-reveal].in :is(.quotes blockquote,.li-grid .li-card,.formats>div):nth-child(4){transition-delay:.24s}
+  [data-reveal].in :is(.quotes blockquote,.li-grid .li-card,.formats>div):nth-child(5){transition-delay:.32s}
+  [data-reveal].in :is(.quotes blockquote,.li-grid .li-card,.formats>div):nth-child(6){transition-delay:.4s}
+  [data-reveal].in :is(.quotes blockquote,.li-grid .li-card,.formats>div):nth-child(7){transition-delay:.48s}
+  [data-reveal].in :is(.quotes blockquote,.li-grid .li-card,.formats>div):nth-child(n+8){transition-delay:.56s}
 
   /* 2 - HERO LINE REVEAL: name rises out of a mask, rest fades in */
   .hl>span{transform:translateY(112%);animation:hero-rise .65s cubic-bezier(.19,.65,.22,1) forwards}
@@ -635,26 +635,24 @@ blockquote cite{font-family:var(--mono);font-style:normal;font-size:.6875rem;let
   .day-slide:is(.older,.newer)>*{animation:day-slide .5s cubic-bezier(.2,.7,.2,1) calc(var(--i,0) * 60ms) backwards}
   @keyframes day-slide{from{opacity:0;transform:translateX(var(--from))}to{opacity:1;transform:none}}
 
-  /* 7 - HAIRLINES DRAW: list rules draw left to right as the list reveals */
+  /* 7 - HAIRLINES DRAW: each list row's rule draws left to right as that
+     row scrolls into view (RevealObserver adds .drawn), then its text follows */
   :is(.newslist>li,.timeline li,.pred-list>li,.mini-list li,.story){position:relative;border-top-color:transparent}
   :is(.newslist>li,.timeline li,.pred-list>li,.mini-list li,.story)::before,
   :is(.newslist>li:last-child,.timeline li:last-child,.pred-list>li:last-child,.mini-list li:last-child,.story:last-of-type)::after{
     content:"";position:absolute;left:0;right:0;height:1px;background:var(--hair);
     transform-origin:left;
-    transition:transform .8s cubic-bezier(.65,0,.2,1) var(--d,0s);
+    transition:transform 1.1s cubic-bezier(.65,0,.2,1) var(--d,0s);
   }
   :is(.newslist>li,.timeline li,.pred-list>li,.mini-list li,.story)::before{top:-1px}
   :is(.newslist>li:last-child,.timeline li:last-child,.pred-list>li:last-child,.mini-list li:last-child,.story:last-of-type){border-bottom-color:transparent}
-  :is(.newslist>li:last-child,.timeline li:last-child,.pred-list>li:last-child,.mini-list li:last-child,.story:last-of-type)::after{bottom:-1px;transition-delay:calc(var(--d,0s) + .1s)}
-  :is([data-reveal]:not(.in) :is(.newslist>li,.timeline li,.pred-list>li,.mini-list li,.story),:is(.pred-list>li)[data-reveal]:not(.in))::before,
-  :is([data-reveal]:not(.in) :is(.newslist>li,.timeline li,.pred-list>li,.mini-list li,.story),:is(.pred-list>li)[data-reveal]:not(.in))::after{transform:scaleX(0)}
-  :is(.newslist>li,.timeline li,.mini-list li,.story):nth-child(2){--d:.08s}
-  :is(.newslist>li,.timeline li,.mini-list li,.story):nth-child(3){--d:.16s}
-  :is(.newslist>li,.timeline li,.mini-list li,.story):nth-child(4){--d:.24s}
-  :is(.newslist>li,.timeline li,.mini-list li,.story):nth-child(5){--d:.32s}
-  :is(.newslist>li,.timeline li,.mini-list li,.story):nth-child(6){--d:.4s}
-  :is(.newslist>li,.timeline li,.mini-list li,.story):nth-child(7){--d:.48s}
-  :is(.newslist>li,.timeline li,.mini-list li,.story):nth-child(n+8){--d:.56s}
+  :is(.newslist>li:last-child,.timeline li:last-child,.pred-list>li:last-child,.mini-list li:last-child,.story:last-of-type)::after{bottom:-1px;transition-delay:calc(var(--d,0s) + .15s)}
+  :is(.newslist>li,.timeline li,.pred-list>li,.mini-list li,.story)>*{transition:opacity .6s ease calc(var(--d,0s) + .35s),transform .6s ease calc(var(--d,0s) + .35s)}
+  :is(.newslist>li,.timeline li,.pred-list>li,.mini-list li,.story):not(.drawn)::before,
+  :is(.newslist>li:last-child,.timeline li:last-child,.pred-list>li:last-child,.mini-list li:last-child,.story:last-of-type):not(.drawn)::after{transform:scaleX(0)}
+  :is(.newslist>li,.timeline li,.pred-list>li,.mini-list li,.story):not(.drawn)>*{opacity:0;transform:translateX(-10px)}
+  /* predictions rows reveal one by one - let the row draw instead of fading whole */
+  .pred-list>li[data-reveal]{opacity:1;transform:none}
 
   /* 8 - SCROLL-LIT WORDS: ScrollLit writes --k, each word lights in turn */
   .lit-w{opacity:calc(.16 + .84 * clamp(0, var(--k,999) - var(--i,0), 1));transition:opacity .15s linear}

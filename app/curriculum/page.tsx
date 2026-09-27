@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import ScrollLit from "@/components/ScrollLit";
 
 export const metadata: Metadata = {
   title: "AI Curriculum",
@@ -73,9 +74,11 @@ export default function CurriculumPage() {
               <p className="label">Why I built it</p>
             </div>
             <div>
-              <h2 className="display-m" style={{ marginBottom: 26 }}>
-                Every keynote ends with the same question
-              </h2>
+              <ScrollLit
+                className="display-m"
+                style={{ marginBottom: 26 }}
+                parts={["Every keynote ends with the same question"]}
+              />
               <p className="body-max" style={{ color: "var(--dim)" }}>
                 &ldquo;How do I keep up?&rdquo; I have heard it from CEOs,
                 boards and leadership teams after every single talk. There is

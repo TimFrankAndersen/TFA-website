@@ -3,6 +3,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import RevealObserver from "@/components/RevealObserver";
+import { ROWS } from "@/lib/motion";
 import Tracker from "@/components/Tracker";
 
 export const metadata: Metadata = {
@@ -81,7 +82,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
         />
         <noscript>
-          <style>{`[data-reveal],[data-reveal] *{opacity:1 !important;transform:none !important}`}</style>
+          <style>{`[data-reveal],[data-reveal] *,:is(${ROWS})>*{opacity:1 !important;transform:none !important}:is(${ROWS})::before,:is(${ROWS})::after{transform:none !important}`}</style>
         </noscript>
         <Header />
         <main>{children}</main>
