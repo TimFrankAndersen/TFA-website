@@ -6,7 +6,7 @@ import ScrollLit from "@/components/ScrollLit";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Tim Frank Andersen - 30 years in digital and technology, from founding one of Denmark's first digital agencies to co-founding Institute of AI.",
+    "Tim Frank Andersen - 30 years in digital and technology, from founding one of Denmark's first digital agencies to co-founding institute of AI.",
 };
 
 export default function AboutPage() {
@@ -79,7 +79,7 @@ export default function AboutPage() {
                 </li>
                 <li>
                   <span className="y">2023</span>
-                  <span className="e">Co-founded Institute of AI</span>
+                  <span className="e">Co-founded institute of AI</span>
                 </li>
               </ol>
             </div>
@@ -100,7 +100,7 @@ export default function AboutPage() {
                 agency groups (acquired by KMD and renamed Charlie Tango in
                 2017). In 2020 he
                 co-founded the SaaS company Liveshopper, backed by BOOZT, and
-                in 2023 co-founded Institute of AI, where he now helps
+                in 2023 co-founded institute of AI, where he now helps
                 organisations build their AI strategy.
               </p>
               <p>
@@ -122,13 +122,13 @@ export default function AboutPage() {
       {/* INSTITUTE OF AI (dark, one section) */}
       <div className="band dark">
         <div className="wrap" data-reveal>
-          <p className="label">About Institute of AI</p>
+          <p className="label">About institute of AI</p>
           <div className="split" style={{ marginTop: 34 }}>
             <div>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/founders-web.jpg"
-                alt="Tim Frank Andersen and his partner Simon, co-founders of Institute of AI"
+                alt="Tim Frank Andersen and his partner Simon, co-founders of institute of AI"
                 style={{ display: "block", width: "100%", height: "auto" }}
               />
               <p
@@ -139,7 +139,7 @@ export default function AboutPage() {
                   letterSpacing: ".02em",
                 }}
               >
-                Tim and Simon - the two co-founders of Institute of AI
+                Tim and Simon - the two co-founders of institute of AI
               </p>
             </div>
             <div>
@@ -149,7 +149,7 @@ export default function AboutPage() {
                 parts={["AI isn\u2019t the future - it\u2019s your company\u2019s next step"]}
               />
               <p className="body-max" style={{ color: "var(--dim)" }}>
-                Institute of AI is an AI strategy consultancy founded with one
+                institute of AI is an AI strategy consultancy founded with one
                 mission: to help organisations understand, adopt and lead with
                 artificial intelligence. We work with C-level executives,
                 boards and leadership teams across industries - from banking
@@ -168,7 +168,7 @@ export default function AboutPage() {
                   target="_blank"
                   rel="noopener"
                 >
-                  Explore Institute of AI <span className="ar">&rarr;</span>
+                  Explore institute of AI <span className="ar">&rarr;</span>
                 </a>
               </div>
             </div>
@@ -187,7 +187,7 @@ export default function AboutPage() {
                 parts={["Where Denmark\u2019s AI leaders compare notes"]}
               />
               <p className="body-max" style={{ color: "var(--dim)" }}>
-                Institute of AI also runs the Advanced AI Network - an
+                institute of AI also runs the Advanced AI Network - an
                 invitation-only community for the people responsible for AI in
                 Denmark&rsquo;s larger companies. They meet to share
                 what&rsquo;s working and what isn&rsquo;t, and to get concrete,
@@ -239,7 +239,7 @@ export default function AboutPage() {
             parts={["Over the years I have invested in startups", { br: true }, "- and exited quite a few."]}
           />
           <p className="lede" style={{ marginBottom: 34 }}>
-            Besides my co-ownership of Institute of AI, this is my current
+            Besides my co-ownership of institute of AI, this is my current
             portfolio.
           </p>
           <ol className="timeline portfolio">
@@ -285,7 +285,7 @@ export default function AboutPage() {
               </span>
               <span className="e">
                 Nordic pre-seed fund backing B2B software. LP through
-                Institute of AI.
+                institute of AI.
               </span>
             </li>
           </ol>

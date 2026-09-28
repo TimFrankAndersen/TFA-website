@@ -18,7 +18,7 @@ export default function Footer() {
             Medium
           </a>
           <a href="https://www.instituteof.ai" target="_blank" rel="noopener">
-            Institute of AI
+            institute of AI
           </a>
           <a href="mailto:tim@frankandersen.com">tim@frankandersen.com</a>
         </div>

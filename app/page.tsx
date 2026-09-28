@@ -80,7 +80,7 @@ export default async function Home() {
                   "Thirty years in tech - from founding one of Denmark\u2019s first",
                   { keep: "digital agencies" },
                   "to co-founding",
-                  { keep: "Institute of AI." },
+                  { keep: "institute of AI." },
                   "Author,",
                   { keep: "tech expert" },
                   "on TV, and advisor to some of the world\u2019s",
