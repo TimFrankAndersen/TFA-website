@@ -37,10 +37,10 @@ const JSON_LD = {
       image: "https://www.timfrankandersen.com/images/about-portrait-bw.jpg",
       jobTitle: "Keynote speaker and moderator on AI and technology",
       description:
-        "Keynote speaker and moderator on AI and technology. 30 years in tech - from founding one of Denmark's first digital agencies to co-founding Institute of AI.",
+        "Keynote speaker and moderator on AI and technology. 30 years in tech - from founding one of Denmark's first digital agencies to co-founding institute of AI.",
       worksFor: {
         "@type": "Organization",
-        name: "Institute of AI",
+        name: "institute of AI",
         url: "https://www.instituteof.ai",
       },
       alumniOf: "M.Sc. in Computer Science",

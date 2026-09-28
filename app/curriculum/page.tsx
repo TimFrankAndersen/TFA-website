@@ -61,7 +61,7 @@ export default function CurriculumPage() {
             <br />
             Curated daily, filtered by role and industry.
             <br />
-            Built by Institute of AI.
+            Built by institute of AI.
           </p>
         </div>
       </div>
@@ -87,7 +87,7 @@ export default function CurriculumPage() {
                 anyway.
               </p>
               <p className="body-max" style={{ color: "var(--dim)" }}>
-                So at Institute of AI we built the answer: a platform that
+                So at institute of AI we built the answer: a platform that
                 reads 200+ sources every day and hands each leader only what
                 matters to them. And yes - we built it with AI. I would not
                 stand on stage telling you what these tools can do if I had
