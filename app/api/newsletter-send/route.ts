@@ -94,7 +94,7 @@ function renderEmail(
             Curated by Tim Frank Andersen
           </td>
           <td align="right" style="vertical-align:baseline">
-            <a href="https://www.timfrankandersen.com/news"
+            <a href="https://www.timfrankandersen.com/news?ref=newsletter"
                style="font-family:${sans};font-size:13px;font-weight:700;color:#1E4B3A;text-decoration:none;white-space:nowrap">
               Read on the site &rarr;</a>
           </td>
@@ -104,6 +104,15 @@ function renderEmail(
     </div>
     <div style="padding:0 24px">
       <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse">${items}</table>
+
+      <!-- Sources live on the site, not in the mail (Tim's call, 2026-10-05):
+           most readers do not want links, the few who do take one extra click.
+           ?ref=newsletter lets the dashboard count these visits. -->
+      <p style="font-family:${sans};font-size:15px;line-height:1.55;color:#141414;margin:28px 0 0">
+        Want to dig deeper? You'll find the sources for all five stories on
+        <a href="https://www.timfrankandersen.com/news?ref=newsletter"
+           style="color:#1E4B3A;font-weight:700;text-decoration:underline">my website</a>.
+      </p>
 
       <!-- CTA row: comment lands in Tim's inbox; share opens a ready-made
            mail in the reader's own client (personal recommendation) -->

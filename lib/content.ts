@@ -1,7 +1,8 @@
 import fallbackNews from "@/data/news-days.json";
 import fallbackPosts from "@/data/linkedin-posts.json";
 
-export type Story = { h: string; p: string };
+/** h = headline, p = summary, u = source link (when the page has one). */
+export type Story = { h: string; p: string; u?: string };
 export type NewsDay = { date: string; isToday: boolean; stories: Story[] };
 export type LinkedInPost = {
   tag: "LinkedIn" | "Article";
@@ -143,11 +144,15 @@ function formatMonthYear(iso: string): string {
  *  - current: a heading_3 block per headline (grouped under heading_2
  *    sections like "Top stories" / "Also today"), then a summary paragraph,
  *    then a link paragraph.
- * Section headings (heading_1/heading_2) and link paragraphs are skipped.
+ * Section headings (heading_1/heading_2) are skipped. A link-only paragraph
+ * right after a story's summary is kept as that story's source link.
  */
 function parseStories(blocks: NotionBlock[]): Story[] {
   const stories: Story[] = [];
   let current: Story | null = null;
+  // A source link counts only when it directly follows the summary, so a
+  // stray link in the metadata below the stories is never picked up.
+  let afterSummary = false;
 
   for (const block of blocks) {
     const t = block.type;
@@ -166,11 +171,22 @@ function parseStories(blocks: NotionBlock[]): Story[] {
       (x) => x.href || x.plain_text.trim().startsWith("http")
     );
 
+    // Stop once we have 5 COMPLETE stories (headline + summary), letting
+    // through only the 5th story's own source link. Counting raw length
+    // would include the bold intro line ("Today in AI - <date>"), which
+    // parses as a headline-only phantom and would cut off the real 5th
+    // story one block too early.
+    if (stories.filter((s) => s.p).length >= 5 && !(afterSummary && allLinks)) {
+      break;
+    }
+
     if (t === "heading_3") {
+      afterSummary = false;
       // current format: heading = story headline
       current = { h: rt.map((x) => x.plain_text).join("").trim(), p: "" };
       stories.push(current);
     } else if (startsBold) {
+      afterSummary = false;
       // legacy format: bold-paragraph headline
       const headline = rt
         .filter((x) => x.annotations?.bold)
@@ -182,15 +198,18 @@ function parseStories(blocks: NotionBlock[]): Story[] {
       // Any non-bold remainder in the same paragraph is a marker like
       // "(top)" - intentionally dropped.
     } else if (allLinks) {
-      continue; // source-link paragraph
+      // source-link paragraph: kept only as the source of the story above
+      if (current && afterSummary && !current.u) {
+        const href = (rt.find((x) => x.href)?.href ?? rt[0].plain_text).trim();
+        if (/^https?:\/\//.test(href)) current.u = href;
+      }
+      afterSummary = false;
     } else if (current && !current.p) {
       current.p = rt.map((x) => x.plain_text).join("").trim();
+      afterSummary = true;
+    } else {
+      afterSummary = false;
     }
-    // Stop once we have 5 COMPLETE stories (headline + summary). Counting
-    // raw length would include the bold intro line ("Today in AI - <date>"),
-    // which parses as a headline-only phantom and would cut off the real
-    // 5th story one block too early.
-    if (stories.filter((s) => s.p).length >= 5) break;
   }
   return stories
     .filter((s) => s.h && s.p)
@@ -203,6 +222,7 @@ function parseStories(blocks: NotionBlock[]): Story[] {
         .replace(/(\s*\([^)]*\))+\s*$/, "")
         .trim(),
       p: s.p,
+      ...(s.u ? { u: s.u } : {}),
     }))
     .slice(0, 5);
 }

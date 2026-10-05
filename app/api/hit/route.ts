@@ -24,6 +24,9 @@ function dailyVisitorHash(ip: string, ua: string): string {
 
 function refHost(referrer: string | undefined): string | null {
   if (!referrer) return null;
+  // Mail clients send no referrer, so the newsletter's links carry
+  // ?ref=newsletter and the tracker passes that on as-is.
+  if (referrer === "newsletter") return "newsletter";
   try {
     const host = new URL(referrer).hostname.replace(/^www\./, "");
     return host.includes("timfrankandersen.com") ? null : host;
@@ -49,7 +52,10 @@ export async function POST(req: NextRequest) {
   if (!path.startsWith("/") || path.startsWith("/dashboard")) {
     return NextResponse.json({ ok: true });
   }
-  const kind = body.kind === "leave" ? "leave" : "view";
+  // "click" = a click through to a news story's source; its referrer
+  // column holds the source's host, not where the visitor came from.
+  const kind =
+    body.kind === "leave" ? "leave" : body.kind === "click" ? "click" : "view";
   const secs =
     kind === "leave" && Number.isFinite(body.secs)
       ? Math.min(Math.max(Math.round(body.secs as number), 0), 3600)
