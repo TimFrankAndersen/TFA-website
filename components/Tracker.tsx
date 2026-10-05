@@ -36,7 +36,14 @@ export default function Tracker() {
       started.current = Date.now();
     }
 
-    send({ path: pathname, ref: document.referrer, kind: "view" });
+    // Mail clients strip the referrer; the newsletter's links say ?ref=newsletter.
+    const fromNewsletter =
+      new URLSearchParams(window.location.search).get("ref") === "newsletter";
+    send({
+      path: pathname,
+      ref: fromNewsletter ? "newsletter" : document.referrer,
+      kind: "view",
+    });
 
     const onHide = () => {
       if (document.visibilityState === "hidden") {

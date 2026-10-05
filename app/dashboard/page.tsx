@@ -45,7 +45,7 @@ async function analytics() {
       GROUP BY 1 ORDER BY 1`,
       sql`SELECT path, count(*) AS views, count(DISTINCT visitor) AS visitors,
         round(avg(secs) FILTER (WHERE kind='leave' AND secs > 0)) AS avg_secs
-      FROM hits WHERE ts >= now() - interval '30 days'
+      FROM hits WHERE kind <> 'click' AND ts >= now() - interval '30 days'
       GROUP BY path ORDER BY count(*) FILTER (WHERE kind='view') DESC LIMIT 10`,
       sql`SELECT referrer, count(*) AS views FROM hits
       WHERE kind='view' AND referrer IS NOT NULL AND ts >= now() - interval '30 days'
@@ -90,6 +90,45 @@ async function newsletter() {
     const flagged = (contacts as Contact[]).filter((c) => c.unsubscribed);
     return { total: active.length, flagged, last24h: last24h.length, last14: last14.length, newest, broadcasts };
   } catch {
+    return null;
+  }
+}
+
+/**
+ * Clicks through to the news stories' sources, next to visits that came
+ * from the newsletter (?ref=newsletter). Tells Tim whether readers want the
+ * source links, i.e. whether they belong in the mail itself.
+ */
+async function sourceClicks() {
+  try {
+    const sql = db();
+    const [kpis, days, hosts] = await Promise.all([
+      sql`SELECT
+        count(*) FILTER (WHERE kind='click' AND (ts AT TIME ZONE 'Europe/Copenhagen')::date = (now() AT TIME ZONE 'Europe/Copenhagen')::date) AS clicks_today,
+        count(DISTINCT visitor) FILTER (WHERE kind='click' AND (ts AT TIME ZONE 'Europe/Copenhagen')::date = (now() AT TIME ZONE 'Europe/Copenhagen')::date) AS clickers_today,
+        count(DISTINCT visitor) FILTER (WHERE kind='view' AND referrer='newsletter' AND (ts AT TIME ZONE 'Europe/Copenhagen')::date = (now() AT TIME ZONE 'Europe/Copenhagen')::date) AS nl_today,
+        count(*) FILTER (WHERE kind='click' AND ts >= now() - interval '7 days') AS clicks_7d,
+        count(DISTINCT visitor) FILTER (WHERE kind='view' AND referrer='newsletter' AND ts >= now() - interval '7 days') AS nl_7d
+      FROM hits WHERE kind IN ('click','view') AND ts >= now() - interval '8 days'`,
+      sql`SELECT to_char(d, 'DD Mon') AS day,
+        count(DISTINCT h.visitor) FILTER (WHERE h.kind='view' AND h.referrer='newsletter') AS nl,
+        count(DISTINCT h.visitor) FILTER (WHERE h.kind='click') AS clickers,
+        count(h.id) FILTER (WHERE h.kind='click') AS clicks
+      FROM generate_series(
+        (now() AT TIME ZONE 'Europe/Copenhagen')::date - 13,
+        (now() AT TIME ZONE 'Europe/Copenhagen')::date,
+        interval '1 day') AS d
+      LEFT JOIN hits h
+        ON (h.ts AT TIME ZONE 'Europe/Copenhagen')::date = d::date
+        AND h.kind IN ('click','view')
+      GROUP BY d ORDER BY d DESC`,
+      sql`SELECT referrer AS host, count(*) AS clicks FROM hits
+      WHERE kind='click' AND referrer IS NOT NULL AND ts >= now() - interval '30 days'
+      GROUP BY referrer ORDER BY 2 DESC LIMIT 10`,
+    ]);
+    return { kpis: kpis[0] as Row, days: days as Row[], hosts: hosts as Row[] };
+  } catch (err) {
+    console.error("[dashboard] source clicks failed:", err);
     return null;
   }
 }
@@ -266,7 +305,9 @@ export default async function DashboardPage({
     );
   }
 
-  const [a, nl, un] = await Promise.all([analytics(), newsletter(), unsubscribes()]);
+  const [a, nl, un, sc] = await Promise.all([
+    analytics(), newsletter(), unsubscribes(), sourceClicks(),
+  ]);
   // Resend marks both never-confirmed signups and real unsubscribes as
   // "unsubscribed"; only the first are pending.
   const known = un ? await notPendingEmails(un.since) : null;
@@ -362,6 +403,59 @@ export default async function DashboardPage({
                   </p>
                 </div>
               </div>
+
+              {/* KILDEKLIK */}
+              <p className="label" style={{ margin: "clamp(36px,5vw,56px) 0 24px" }}>
+                Kilder til historierne
+              </p>
+              {!sc ? (
+                <p className="note">Kunne ikke hente kildeklik.</p>
+              ) : (
+                <>
+                  <div className="dash-grid">
+                    <Kpi
+                      label="Fra nyhedsbrevet - i dag"
+                      value={String(sc.kpis.nl_today ?? 0)}
+                      sub={`${sc.kpis.nl_7d ?? 0} på 7 dage`}
+                    />
+                    <Kpi
+                      label="Klikkede videre - i dag"
+                      value={String(sc.kpis.clickers_today ?? 0)}
+                      sub={`${sc.kpis.clicks_today ?? 0} klik på en kilde`}
+                    />
+                    <Kpi label="Kildeklik - 7 dage" value={String(sc.kpis.clicks_7d ?? 0)} />
+                  </div>
+                  <div className="dash-two">
+                    <div className="dash-card">
+                      <p className="label" style={{ marginBottom: 12 }}>Pr. dag (14 dage)</p>
+                      <Table
+                        rows={sc.days}
+                        cols={[
+                          { key: "day", label: "Dag" },
+                          { key: "nl", label: "Fra nyhedsbrev", right: true },
+                          { key: "clickers", label: "Klikkede videre", right: true },
+                          { key: "clicks", label: "Klik", right: true },
+                        ]}
+                      />
+                      <p className="note" style={{ marginTop: 12 }}>
+                        &ldquo;Fra nyhedsbrev&rdquo; er besøgende, der kom via linket i mailen.
+                        &ldquo;Klikkede videre&rdquo; er besøgende, der klikkede på mindst én
+                        kilde, uanset hvor de kom fra. Målt fra 5. oktober 2026.
+                      </p>
+                    </div>
+                    <div className="dash-card">
+                      <p className="label" style={{ marginBottom: 12 }}>Mest klikkede medier (30d)</p>
+                      <Table
+                        rows={sc.hosts}
+                        cols={[
+                          { key: "host", label: "Medie" },
+                          { key: "clicks", label: "Klik", right: true },
+                        ]}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
 
               {/* AFMELDINGER */}
               <p className="label" style={{ margin: "clamp(36px,5vw,56px) 0 24px" }}>Afmeldinger</p>

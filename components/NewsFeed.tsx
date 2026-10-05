@@ -4,6 +4,57 @@ import { useEffect, useRef, useState } from "react";
 import type { NewsDay } from "@/lib/content";
 import Decode from "@/components/Decode";
 
+/** Outlets the pipeline links to most often, by domain. */
+const OUTLETS: Record<string, string> = {
+  "apnews.com": "AP",
+  "axios.com": "Axios",
+  "bbc.com": "BBC",
+  "bbc.co.uk": "BBC",
+  "bloomberg.com": "Bloomberg",
+  "cnbc.com": "CNBC",
+  "ft.com": "Financial Times",
+  "nytimes.com": "The New York Times",
+  "reuters.com": "Reuters",
+  "scmp.com": "South China Morning Post",
+  "techcrunch.com": "TechCrunch",
+  "theguardian.com": "The Guardian",
+  "theinformation.com": "The Information",
+  "theregister.com": "The Register",
+  "theverge.com": "The Verge",
+  "version2.dk": "Version2",
+  "washingtonpost.com": "The Washington Post",
+  "wired.com": "Wired",
+  "wsj.com": "The Wall Street Journal",
+};
+
+/** "https://www.theregister.com/..." -> "The Register"; unknown -> domain. */
+function sourceName(url: string): string {
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, "");
+    const known = Object.keys(OUTLETS).find(
+      (d) => host === d || host.endsWith(`.${d}`)
+    );
+    return known ? OUTLETS[known] : host;
+  } catch {
+    return "source";
+  }
+}
+
+/** Counts a click through to a source on the dashboard (see /api/hit). */
+function logSourceClick(url: string) {
+  try {
+    navigator.sendBeacon(
+      "/api/hit",
+      new Blob(
+        [JSON.stringify({ path: window.location.pathname, kind: "click", ref: url })],
+        { type: "application/json" }
+      )
+    );
+  } catch {
+    /* tracking must never break the link */
+  }
+}
+
 /**
  * Date-stepped daily feed. Convention (Tim's call): the LEFT arrow goes
  * BACK in time (older), the RIGHT arrow goes forward toward today.
@@ -115,6 +166,17 @@ export default function NewsFeed({
               </div>
               <h3 className="display-s">{s.h}</h3>
               <p>{s.p}</p>
+              {s.u && (
+                <a
+                  className="arrow source-link"
+                  href={s.u}
+                  target="_blank"
+                  rel="noopener"
+                  onClick={() => logSourceClick(s.u!)}
+                >
+                  Read more: {sourceName(s.u)} <span className="ar">&rarr;</span>
+                </a>
+              )}
             </article>
           ))}
         </div>
