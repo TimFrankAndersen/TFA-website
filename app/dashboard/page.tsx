@@ -196,6 +196,26 @@ async function unsubscribes() {
   }
 }
 
+/** Cumulative gross joins, gross unsubscribes and net, one row per day since the first confirmed subscriber. */
+async function growth() {
+  try {
+    const rows = await db()`
+      WITH c AS (
+        SELECT (coalesce(confirmed_at, created_at) AT TIME ZONE 'Europe/Copenhagen')::date AS joined,
+               (unsubscribed_at AT TIME ZONE 'Europe/Copenhagen')::date AS gone
+        FROM newsletter_contacts WHERE confirmed)
+      SELECT to_char(d, 'YYYY-MM-DD') AS day,
+        (SELECT count(*) FROM c WHERE joined <= d::date)::int AS joined,
+        (SELECT count(*) FROM c WHERE gone <= d::date)::int AS gone
+      FROM generate_series((SELECT min(joined) FROM c), (now() AT TIME ZONE 'Europe/Copenhagen')::date, interval '1 day') AS d
+      ORDER BY d`;
+    return (rows as Row[]).map((r) => ({ day: String(r.day), joined: Number(r.joined), gone: Number(r.gone) }));
+  } catch (err) {
+    console.error("[dashboard] growth failed:", err);
+    return null;
+  }
+}
+
 /** Addresses that are unsubscribed in Resend for a known reason other than "not confirmed yet". */
 async function notPendingEmails(since: Date | null) {
   try {
@@ -246,6 +266,58 @@ function Bars({
         </div>
       ))}
     </div>
+  );
+}
+
+const MONTHS_DA = ["jan", "feb", "mar", "apr", "maj", "jun", "jul", "aug", "sep", "okt", "nov", "dec"];
+
+/** Three cumulative lines on one axis: gross joins, gross unsubscribes, net. */
+function GrowthLines({ data }: { data: { day: string; joined: number; gone: number }[] }) {
+  const W = 800, H = 260, ML = 40, MR = 44, MT = 12, MB = 26;
+  const PW = W - ML - MR, PH = H - MT - MB;
+  const n = data.length;
+  const max = Math.max(1, ...data.map((d) => d.joined));
+  const raw = max / 4, pow = 10 ** Math.floor(Math.log10(raw));
+  const step = ([1, 2, 2.5, 5, 10].find((k) => k * pow >= raw) ?? 10) * pow;
+  const yMax = Math.ceil(max / step) * step;
+  const x = (i: number) => ML + (n > 1 ? (i / (n - 1)) * PW : 0);
+  const y = (v: number) => MT + PH - (v / yMax) * PH;
+  const path = (key: "joined" | "gone" | "net") =>
+    data.map((d, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(key === "net" ? d.joined - d.gone : d[key]).toFixed(1)}`).join(" ");
+  const last = data[n - 1];
+  const series = [
+    { key: "joined" as const, color: "#199e70", value: last.joined },
+    { key: "gone" as const, color: "#d95926", value: last.gone },
+    { key: "net" as const, color: "currentColor", value: last.joined - last.gone },
+  ];
+  // Spread end labels apart when two lines end close together.
+  const ends = series.map((s) => ({ ...s, ly: y(s.value) })).sort((a, b) => a.ly - b.ly);
+  for (let i = 1; i < ends.length; i++) if (ends[i].ly - ends[i - 1].ly < 14) ends[i].ly = ends[i - 1].ly + 14;
+  const ticks: number[] = [];
+  for (let v = 0; v <= yMax; v += step) ticks.push(v);
+  const months = data.map((d, i) => ({ d, i })).filter(({ d }) => d.day.endsWith("-01"));
+  const mono = { fontFamily: "var(--mono)", fontSize: 10, fill: "var(--dim)" } as const;
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Brutto tilgang ${last.joined}, brutto afgang ${last.gone}, netto ${last.joined - last.gone}`} style={{ display: "block", width: "100%", height: "auto", overflow: "visible" }}>
+      {ticks.map((v) => (
+        <g key={v}>
+          <line x1={ML} x2={W - MR} y1={y(v)} y2={y(v)} stroke="var(--hair)" strokeWidth={v === 0 ? 1 : 0.5} />
+          <text x={ML - 8} y={y(v) + 3} textAnchor="end" style={mono}>{v}</text>
+        </g>
+      ))}
+      {months.map(({ d, i }) => (
+        <text key={d.day} x={x(i)} y={H - 8} textAnchor="middle" style={mono}>1. {MONTHS_DA[Number(d.day.slice(5, 7)) - 1]}</text>
+      ))}
+      {series.map((s) => (
+        <path key={s.key} d={path(s.key)} fill="none" stroke={s.color} strokeWidth={s.key === "net" ? 2.5 : 2} strokeLinejoin="round" />
+      ))}
+      {ends.map((s) => (
+        <g key={s.key}>
+          <circle cx={x(n - 1)} cy={y(s.value)} r={4} fill={s.color} />
+          <text x={x(n - 1) + 9} y={s.ly + 4} style={{ ...mono, fontSize: 12, fontWeight: 600, fill: "currentColor" }}>{s.value}</text>
+        </g>
+      ))}
+    </svg>
   );
 }
 
@@ -305,8 +377,8 @@ export default async function DashboardPage({
     );
   }
 
-  const [a, nl, un, sc] = await Promise.all([
-    analytics(), newsletter(), unsubscribes(), sourceClicks(),
+  const [a, nl, un, sc, gr] = await Promise.all([
+    analytics(), newsletter(), unsubscribes(), sourceClicks(), growth(),
   ]);
   // Resend marks both never-confirmed signups and real unsubscribes as
   // "unsubscribed"; only the first are pending.
@@ -367,6 +439,23 @@ export default async function DashboardPage({
                   );
                 })()}
               </div>
+              {gr && gr.length > 1 && (
+                <div className="dash-card" style={{ marginBottom: 20 }}>
+                  <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: "8px 16px", marginBottom: 16 }}>
+                    <p className="label" style={{ margin: 0 }}>Abonnenter siden start</p>
+                    <p className="note" style={{ margin: 0, display: "flex", gap: 14, flexWrap: "wrap" }}>
+                      {[["#199e70", "Brutto tilgang"], ["#d95926", "Brutto afgang"], ["currentColor", "Netto"]].map(([c, l]) => (
+                        <span key={l}><span style={{ display: "inline-block", width: 14, height: 2, background: c, verticalAlign: "middle", marginRight: 6 }} />{l}</span>
+                      ))}
+                    </p>
+                  </div>
+                  <GrowthLines data={gr} />
+                  <p className="note" style={{ marginTop: 12 }}>
+                    Akkumuleret pr. dag. Tilgang tæller bekræftede tilmeldinger; afgang er kun kendt
+                    {un?.sinceLabel ? ` fra ${un.sinceLabel}` : " fra webhook'en kom til"}, så netto ligger reelt lidt lavere før da.
+                  </p>
+                </div>
+              )}
               <div className="dash-two">
                 <div className="dash-card">
                   <p className="label" style={{ marginBottom: 12 }}>Seneste tilmeldinger</p>
