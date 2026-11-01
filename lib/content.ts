@@ -213,17 +213,26 @@ function parseStories(blocks: NotionBlock[]): Story[] {
   }
   return stories
     .filter((s) => s.h && s.p)
-    .map((s) => ({
-      // Pipeline quirks the site must never render (Tim's rule: nothing in
-      // parentheses in headlines): strip leading self-numbering ("1. ...")
-      // and trailing parenthetical markers like "(top)" / "(also today)".
-      h: s.h
-        .replace(/^\d+[.)]\s*/, "")
-        .replace(/(\s*\([^)]*\))+\s*$/, "")
-        .trim(),
-      p: s.p,
-      ...(s.u ? { u: s.u } : {}),
-    }))
+    .map((s) => {
+      // A source link written into the summary paragraph itself (one line
+      // break instead of its own paragraph, as on 1 Nov 2026) must never
+      // reach the mail (Tim's rule: sources only on the site). Strip it from
+      // the summary and keep it as the story's source link instead.
+      const tail = s.p.match(/(?:\s+https?:\/\/\S+)+\s*$/);
+      const p = tail ? s.p.slice(0, tail.index).trim() : s.p;
+      const u = s.u ?? tail?.[0].trim().split(/\s+/)[0];
+      return {
+        // Pipeline quirks the site must never render (Tim's rule: nothing in
+        // parentheses in headlines): strip leading self-numbering ("1. ...")
+        // and trailing parenthetical markers like "(top)" / "(also today)".
+        h: s.h
+          .replace(/^\d+[.)]\s*/, "")
+          .replace(/(\s*\([^)]*\))+\s*$/, "")
+          .trim(),
+        p,
+        ...(u ? { u } : {}),
+      };
+    })
     .slice(0, 5);
 }
 
