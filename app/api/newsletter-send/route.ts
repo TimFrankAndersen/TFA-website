@@ -28,6 +28,7 @@ const ALERT_FROM_LOCAL_TIME = "06:00";
 // A broadcast normally goes from queued to sent within a minute; one that
 // is still not sent after this long is stuck and needs a human.
 const STUCK_AFTER_MS = 10 * 60 * 1000;
+const TRAVEL_BANNER_LAST_DAY = "2026-11-16"; // Copenhagen date, inclusive
 
 function headers() {
   return {
@@ -75,6 +76,25 @@ function renderEmail(
     )
     .join("");
 
+  // Temporary notice while Tim travels; disappears by itself after the last
+  // day. Sits between the header line and story 01.
+  const travelBanner =
+    copenhagenTodayISO() <= TRAVEL_BANNER_LAST_DAY
+      ? `
+      <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;margin:20px 0 0">
+        <tr>
+          <td style="background:#1E4B3A;border-radius:10px;padding:16px 18px">
+            <p style="font-family:${mono};font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#FBF7EF;margin:0 0 6px">
+              &#9632;&nbsp; On the road until 16 November
+            </p>
+            <p style="font-family:${sans};font-size:14px;line-height:1.5;color:#FBF7EF;margin:0">
+              The newsletter may arrive later than usual or skip a day while I am away. Everything goes back to normal when I am home.
+            </p>
+          </td>
+        </tr>
+      </table>`
+      : "";
+
   return `
 <div style="margin:0;padding:0;background:#FBF7EF">
   <div style="max-width:600px;margin:0 auto;padding:0 0 36px;">
@@ -100,7 +120,7 @@ function renderEmail(
           </td>
         </tr>
       </table>
-      <div style="height:1px;background:#e5e0d5"></div>
+      <div style="height:1px;background:#e5e0d5"></div>${travelBanner}
     </div>
     <div style="padding:0 24px">
       <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse">${items}</table>
