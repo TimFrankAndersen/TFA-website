@@ -28,6 +28,9 @@ const ALERT_FROM_LOCAL_TIME = "06:00";
 // A broadcast normally goes from queued to sent within a minute; one that
 // is still not sent after this long is stuck and needs a human.
 const STUCK_AFTER_MS = 10 * 60 * 1000;
+// Create and send are two calls a few milliseconds apart. A draft older
+// than this was refused by Resend at the send step and is safe to retry.
+const DRAFT_RETRY_AFTER_MS = 2 * 60 * 1000;
 
 function headers() {
   return {
@@ -259,6 +262,10 @@ export async function GET(req: NextRequest) {
   // cancelled send kept its name and silently blocked every later attempt,
   // including both Vercel crons. Canceled and failed broadcasts cannot be
   // resent or renamed through the API either, so the day was unrecoverable.
+  // A draft is the opposite case: Resend took the broadcast but refused to
+  // send it. On 2026-11-16 the contacts quota was full, the draft kept the
+  // day's name and every later attempt answered "already sent today". A
+  // draft can still be sent, so a later call sends it instead of skipping.
   const name = `daily-${copenhagenTodayISO()}`;
   const DEAD_STATUSES = new Set(["canceled", "failed"]);
   const list = await fetch(`${RESEND_API}/broadcasts`, { headers: headers() }).then((r) => r.json());
@@ -266,14 +273,19 @@ export async function GET(req: NextRequest) {
     (b: { name?: string }) => b.name === name
   );
   const blocking = sameName.find(
-    (b: { status?: string; created_at?: string }) => !DEAD_STATUSES.has(b.status ?? "")
+    (b: { id?: string; status?: string; created_at?: string }) =>
+      !DEAD_STATUSES.has(b.status ?? "")
   );
-  if (blocking) {
+  const blockingAge = blocking ? Date.now() - Date.parse(blocking.created_at ?? "") : 0;
+  const draftId: string | undefined =
+    blocking?.status === "draft" && blockingAge > DRAFT_RETRY_AFTER_MS
+      ? blocking.id
+      : undefined;
+  if (blocking && !draftId) {
     // Exists but never reached "sent": Resend accepted it and then stalled.
     // Nothing here can fix that, so tell Tim rather than wait for a caller
     // that will never come (this replaced the 13:25 watchdog task).
-    const age = Date.now() - Date.parse(blocking.created_at ?? "");
-    const stuck = blocking.status !== "sent" && age > STUCK_AFTER_MS;
+    const stuck = blocking.status !== "sent" && blockingAge > STUCK_AFTER_MS;
     const alerted = stuck
       ? await alert(
           `Nyhedsbrev hænger kl. ${now}: broadcast status ${blocking.status}`,
@@ -286,46 +298,52 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: true, sent: false, reason: "already sent today", alerted });
   }
 
-  // 3. Create + send the broadcast.
-  const create = await fetch(`${RESEND_API}/broadcasts`, {
-    method: "POST",
-    headers: headers(),
-    body: JSON.stringify({
-      name,
-      audience_id: process.env.RESEND_AUDIENCE_ID,
-      from: process.env.NEWSLETTER_FROM ?? "news@timfrankandersen.com",
-      reply_to: process.env.NEWSLETTER_REPLY_TO ?? "tim@frankandersen.com",
-      subject: `Today in AI: ${today.stories[0].h}`,
-      html: renderEmail(today.date, today.stories),
-    }),
-  });
-  const created = await create.json();
-  if (!create.ok || !created.id) {
-    console.error("[newsletter] broadcast create failed:", created);
-    const alerted = await alert(
-      `Nyhedsbrev ikke sendt kl. ${now}: Resend afviste broadcastet`,
-      `Resend afviste oprettelsen af dagens broadcast (HTTP ${create.status}). ` +
-        "Tjek Resend-dashboardet. " +
-        nextAttempts
-    );
-    return NextResponse.json({ ok: false, alerted }, { status: 502 });
+  // 3. Create the broadcast (unless an unsent draft is waiting) + send it.
+  let broadcastId = draftId;
+  if (!broadcastId) {
+    const create = await fetch(`${RESEND_API}/broadcasts`, {
+      method: "POST",
+      headers: headers(),
+      body: JSON.stringify({
+        name,
+        audience_id: process.env.RESEND_AUDIENCE_ID,
+        from: process.env.NEWSLETTER_FROM ?? "news@timfrankandersen.com",
+        reply_to: process.env.NEWSLETTER_REPLY_TO ?? "tim@frankandersen.com",
+        subject: `Today in AI: ${today.stories[0].h}`,
+        html: renderEmail(today.date, today.stories),
+      }),
+    });
+    const created = await create.json();
+    if (!create.ok || !created.id) {
+      console.error("[newsletter] broadcast create failed:", created);
+      const alerted = await alert(
+        `Nyhedsbrev ikke sendt kl. ${now}: Resend afviste broadcastet`,
+        `Resend afviste oprettelsen af dagens broadcast (HTTP ${create.status}). ` +
+          "Tjek Resend-dashboardet. " +
+          nextAttempts
+      );
+      return NextResponse.json({ ok: false, alerted }, { status: 502 });
+    }
+    broadcastId = created.id;
   }
 
-  const send = await fetch(`${RESEND_API}/broadcasts/${created.id}/send`, {
+  const send = await fetch(`${RESEND_API}/broadcasts/${broadcastId}/send`, {
     method: "POST",
     headers: headers(),
     body: JSON.stringify({}),
   });
   if (!send.ok) {
-    console.error("[newsletter] broadcast send failed:", await send.text());
+    const reason = (await send.text()).slice(0, 300);
+    console.error("[newsletter] broadcast send failed:", reason);
     const alerted = await alert(
       `Nyhedsbrev ikke sendt kl. ${now}: Resend kunne ikke sende broadcastet`,
-      `Broadcastet ${name} blev oprettet, men Resend afviste afsendelsen (HTTP ${send.status}). ` +
-        "Det står nu som draft i Resend-dashboardet og blokerer ikke et nyt forsøg. " +
+      `Broadcastet ${name} blev oprettet, men Resend afviste afsendelsen (HTTP ${send.status}): ` +
+        `${reason} ` +
+        "Det står nu som draft i Resend-dashboardet, og næste kald prøver at sende det igen. " +
         nextAttempts
     );
     return NextResponse.json({ ok: false, alerted }, { status: 502 });
   }
 
-  return NextResponse.json({ ok: true, sent: true, broadcast: created.id, name });
+  return NextResponse.json({ ok: true, sent: true, broadcast: broadcastId, name });
 }
